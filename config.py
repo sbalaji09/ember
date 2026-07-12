@@ -105,7 +105,15 @@ SLOPE_MULTIPLIER_BASELINE = 1.0  # applied outside the threat window
 # then combined by weighted sum. Weights must sum to 1.0.
 EXPOSURE_DRIVER_RANGES = {
     "wildfire_annual_frequency": (0.0, 0.05),      # FEMA NRI annualized frequency
-    "max_directional_threat": (0.0, 4.0),          # matches SLOPE_MULTIPLIER_MAX * FUEL_TYPE_WEIGHTS["high"] * DRYNESS_FACTOR_MAX headroom
+    # NOT the theoretical max (SLOPE_MULTIPLIER_MAX * FUEL_TYPE_WEIGHTS["high"] *
+    # DRYNESS_FACTOR_MAX =~ 6.7): that combination (100% canopy AND fully cured
+    # NDVI AND max slope multiplier, all at once) essentially never occurs in
+    # real raster data. Calibrated instead against real ring-sampled directional
+    # threat vectors across 6 genuinely severe CA WUI properties (Paradise,
+    # Latigo Canyon/Malibu, Big Bear, Forest Falls, Julian, Alpine) with the
+    # observed max at 1.147 (Latigo Canyon, slope multiplier already at cap) and
+    # headroom above it. See LIMITATIONS.md for the calibration data.
+    "max_directional_threat": (0.0, 1.8),
     "housing_units_density_per_km2": (0.0, 2000.0),
     "drought_category_ordinal": (0.0, 4.0),        # D0=0 .. D4=4, null="not in drought"=-1 clamped to 0
     "days_above_32c_annual_count": (0.0, 120.0),

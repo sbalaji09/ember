@@ -3,6 +3,112 @@
 Running log of every null, `partial_failures` entry, resolution gap, and
 judgment call hit while building and testing Ember. Kept for the write-up.
 
+## Calibration investigation: Paradise, CA scored `Low` (post-Phase-2)
+
+**Symptom.** `./ember --json` on 6626 Skyway, Paradise, CA (Camp Fire town,
+2018) returned an overall exposure band of `Low` (composite 0.140). Paradise
+being the highest-profile CA wildfire disaster of the last decade, a `Low`
+band there is the kind of result that makes a reviewer distrust the whole
+tool on sight — worth investigating before treating it as acceptable.
+
+**Investigation.** Ran a known-severe control (3000 Latigo Canyon Rd,
+Malibu — steep Santa Monica Mountains chaparral/oak canyon) through the same
+pipeline. It also came back `Low` (composite 0.216), with its worst bearing's
+**slope multiplier pinned at the config cap (4.0/4.0)** — i.e. the model's
+own steepest-terrain signal was maxed out and the property still didn't
+clear "Moderate." That's decisive on its own: a compressed-scale problem,
+not a Paradise-specific one. To rule out cherry-picking a single control, four
+more real addresses in independently well-known severe-fire WUI locations
+were run through the full pipeline:
+
+| Location | wildfire_annual_frequency (raw) | max_directional_threat (raw) | Band (before fix) | Composite |
+|---|---|---|---|---|
+| Paradise, CA | 0.0014 | 0.448 | Low | 0.140 |
+| Latigo Canyon, Malibu | 0.0127 | 1.147 (slope mult at cap) | Low | 0.216 |
+| Big Bear Lake | 0.0136 | 0.299 | Low | 0.145 |
+| Forest Falls (San Bernardino NF) | 0.0314 | 0.896 | Moderate | 0.290 |
+| Julian (2003 Cedar Fire town) | 0.0460 | 0.359 | Moderate | 0.379 |
+| Alpine (San Diego backcountry) | 0.0224 | 0.815 | Moderate | 0.299 |
+
+None of six real, independently-chosen severe-WUI properties reached `High`
+or `Very High` — including Julian, the town the largest fire in California
+history (at the time) nearly destroyed. **World (a): TUNING problem**, not
+"the data genuinely can't see it."
+
+**Root cause.** `EXPOSURE_DRIVER_RANGES["max_directional_threat"]` was set to
+`(0.0, 4.0)` — the *theoretical* ceiling if a single ring bearing hit max
+fuel weight (1.0), 100% canopy, fully cured NDVI (dryness factor 1.4), and
+the slope multiplier cap (4.0) all simultaneously. That combination
+essentially never occurs in real raster data: 120m block-mode canopy cells
+rarely read 100%, and a cell rarely sits at the NDVI dry floor while also at
+peak canopy. Across all 6 real test properties, the observed max was 1.147
+(Latigo Canyon) — even with the slope multiplier already at its cap. Every
+real directional threat value was landing in roughly the bottom quarter of
+the normalization range no matter how severe the underlying terrain/fuel
+actually was, which dragged the whole composite toward `Low` regardless of
+real severity.
+
+By contrast, `wildfire_annual_frequency`'s range `(0.0, 0.05)` was **not**
+the problem — an 18-point spot-check across historically fire-prone CA
+tracts (Clearlake, Julian, Alpine, La Tuna Canyon, Cobb, Fillmore, Pulga/Camp
+Fire origin, and others) found an empirical ceiling around 0.046 (Julian),
+which already normalizes to ~0.92 under the existing range. Left unchanged.
+
+**Fix.** Single, minimal change in `config.py`:
+`EXPOSURE_DRIVER_RANGES["max_directional_threat"]` changed from `(0.0, 4.0)`
+to `(0.0, 1.8)`, calibrated against the observed real-world max (1.147) plus
+headroom, not against any single address's desired outcome. No band
+thresholds, weights, or other driver ranges were touched.
+
+**Before/after, all 7 addresses (including a flat-terrain control,
+100 Santa Rosa Ave, that should NOT move bands):**
+
+| Location | Before | After | Notes |
+|---|---|---|---|
+| Paradise, CA | Low (0.140) | Low (0.181) | Stays Low — genuinely barren/low-canopy at the sampled ring (see Phase 1 note below), correctly does not flip |
+| Latigo Canyon, Malibu | Low (0.216) | **Moderate (0.321)** | Flips band — steep, forested, real terrain now counted properly |
+| Big Bear Lake | Low (0.145) | Low (0.173) | Stays Low — partial DEM read failures there limited the slope signal at this specific point (see `partial_failures` note) |
+| Forest Falls | Moderate (0.290) | Moderate (0.366) | Moves up within-band, doesn't flip |
+| Julian (Cedar Fire town) | Moderate (0.379) | Moderate (0.412) | Moves up within-band, doesn't flip |
+| Alpine | Moderate (0.299) | Moderate (0.374) | Moves up within-band, doesn't flip |
+| Santa Rosa (flat, low-severity control) | Low (0.111) | Low (0.125) | Barely moves — confirms the fix doesn't inflate genuinely low-risk properties |
+
+The flat control staying flat, and Paradise staying `Low`, are the important
+negative results here: this wasn't a fix that inflates everything or that
+was reverse-engineered to move Paradise specifically. `tests/test_scoring.py`
+was re-run after the change — all 18 tests passed with no modifications
+needed (the synthetic "low vs. very high" exposure test uses
+`max_directional_threat=4.0` for its high case, which now clamps to the new
+range's ceiling exactly as it clamped to the old one, so its assertions were
+unaffected by construction).
+
+**Remaining open question (explaining, not tuning).** Even after the fix,
+Paradise stays `Low`. Its ring data genuinely reads `lcms_class = "Barren or
+Impervious"` with `tree_canopy_pct` in the single digits at multiple
+bearings — consistent with post-Camp-Fire clearing and rebuild, not with the
+forested ridge the town sat on before 2018. This is very plausibly a case
+where **current fuel is genuinely low** even though **tract-level historical
+frequency is not trivial** — the "recently burned, currently cleared" signal
+and the "used to be, and may again become, severely exposed" signal are in
+real tension, and the tool as built averages them into one composite number
+rather than flagging the tension itself. This wasn't fixed as part of this
+investigation (the six-address survey showed the dominant problem was a
+genuine tuning bug, not this), but it's a legitimate follow-up: a dedicated
+flag for "high historical tract frequency + low current fuel reading" would
+make the report more honest about recently-burned properties like Paradise
+specifically. Not implemented yet — flagging for a future pass before
+demos are captured for a Paradise-area address.
+
+**Incidental finding, not a scoring bug.** `design_wind_speed_mph` returned
+exactly `103.0` mph at every one of 6 widely separated CA points tested
+(San Francisco, Los Angeles, Redding, Sequoia NF, Julian, Clearlake) during
+this investigation. Real ASCE 7 basic wind speed maps for non-hurricane-prone
+interior/coastal California are genuinely coarse, so this may not be a data
+bug — but it means this driver currently contributes a constant, essentially
+non-discriminating ~0.033 to every property's composite. Harmless to the
+Low/Moderate/High ordering (it's a wash across candidates), but worth noting
+if the weighting is revisited later.
+
 ## Contract discrepancies vs. the README (Phase 0)
 
 - The README lists `elevation, slope_degrees, lcms_class, tree_canopy_pct, `

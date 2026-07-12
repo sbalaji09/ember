@@ -406,24 +406,66 @@ failure) also survive into `report_data` unfiltered.
 Building `frontend/` (Leaflet map + FastAPI backend at `src/server.py`)
 surfaced two things:
 
-**Real gap found in existing code, not fixed here:**
-`sampling.py`'s `parcel_centroid_from_geojson()` only handles GeoJSON
-`Polygon` geometry — it returns `None` (triggering the fixed-radius
-fallback) for `MultiPolygon`, even when valid geometry is present. This was
-invisible until the frontend actually rendered a parcel outline: at Latigo
-Canyon, Malibu, `parcel_boundary_geojson` is a genuine `MultiPolygon` with
-`status: "ok"`, so the map correctly draws the real parcel shape (Leaflet's
-`L.geoJSON()` handles `MultiPolygon` natively) — but the backend's own ring
-origin fell back to the geocoded point instead of a true parcel centroid,
-because the Python parser silently treats "not a Polygon" the same as "no
-geometry at all." The frontend's `header.ring_origin.source` correctly
-reported `"geocoded_point_fixed_radius_fallback"` for this address, so
-nothing was mis-reported — but the *reason* for the fallback wasn't "no
-geometry" as the fallback language implies, it was "geometry present but
-unhandled shape." Worth fixing in `sampling.py` directly (extend the vertex
-averaging to iterate all polygons in a MultiPolygon) in a future pass; not
-done as part of the frontend work since it's a pre-existing pipeline
-behavior, not something the frontend introduced.
+**FOUND AND FIXED — real code bug, not a data limitation.**
+`sampling.py`'s `parcel_centroid_from_geojson()` only handled GeoJSON
+`Polygon` geometry — it returned `None` (triggering the fixed-radius
+fallback) for `MultiPolygon`, even when valid geometry was present.
+
+*How it was caught* is the more interesting part: this was invisible to
+every prior verification pass (unit tests, `./ember --json` diffs, live
+prose-rendering checks) because none of them rendered the parcel geometry
+itself — they only checked that `ring_origin.source` reported a valid-looking
+value (`"geocoded_point_fixed_radius_fallback"`), which it did, correctly
+and honestly. It only surfaced once the frontend actually drew the parcel
+outline on a map: at Latigo Canyon, Malibu, `parcel_boundary_geojson` is a
+genuine `MultiPolygon` with `status: "ok"`, so Leaflet's `L.geoJSON()`
+(which handles `MultiPolygon` natively) drew the real parcel shape — while
+the ring-origin marker sat at the geocoded point next to it, not the
+parcel's centroid. The mismatch was visible on the map in a way no curl
+check or JSON diff would have caught, because the bug wasn't in any single
+returned value being wrong — `ring_origin.source` genuinely was
+`"geocoded_point_fixed_radius_fallback"` — it was in *why* that fallback
+fired: not "no geometry" (the fallback's documented reason) but "geometry
+present, unhandled shape," which no test was asserting against.
+
+**Fix** (`src/sampling.py`): `parcel_centroid_from_geojson()` now branches
+on `geom["type"]`. The `Polygon` path is untouched (still a simple
+vertex-average of the exterior ring). For `MultiPolygon`, added a
+shoelace-formula area-and-centroid calculation (`_polygon_area_and_centroid`)
+per part, combined via an **area-weighted average across parts** — chosen
+over "centroid of the largest part alone" because real Regrid `MultiPolygon`
+parcels (Latigo Canyon included) tend to have one dominant part plus small
+slivers (easements, right-of-way clips); area-weighting lets the dominant
+part drive the result while still folding in the others, rather than
+discarding them outright. If every part is degenerate (zero area), falls
+back to a plain vertex-average across all parts' vertices rather than
+giving up. The existing "genuinely null geometry → fall back to the
+geocoded point" path is unchanged.
+
+Added `tests/test_sampling.py` (7 new tests, 36 total passing): the
+existing `Polygon` behavior locked down as a regression check; a synthetic
+two-part `MultiPolygon` proving the result is dominated by the larger part
+and is NOT the same as a naive combined vertex-average; degenerate and
+empty-geometry edge cases; and a regression test using the **actual**
+Latigo Canyon `MultiPolygon` geometry captured live, asserting the computed
+centroid falls within the real parcel's bounding box and is meaningfully
+different from the geocoded-point fallback.
+
+**Re-verified Latigo Canyon end-to-end after the fix** (captured
+2026-07-12T2047Z, superseding the earlier 2026-07-12T1940Z demo artifact):
+
+| | Before fix | After fix |
+|---|---|---|
+| `ring_origin.source` | `geocoded_point_fixed_radius_fallback` | `parcel_centroid` |
+| Band | Moderate (0.3209) | Moderate (0.3728) |
+| Top threat | SW: 1.147 | SW: 1.459 |
+| 2nd threat | W: 1.088 | W: 1.100 |
+
+Band held (`Moderate`, not near either boundary at 0.25/0.45). Dominant
+directions held (SW, W). The composite moved up somewhat because the true
+parcel centroid sits slightly further into the steeper part of the canyon
+than the geocoded point did — a more accurate number telling the same
+story, not a different story.
 
 **Debugging note:** the map briefly failed to auto-fit its view around the
 drawn arrows/parcel with `mapLayerGroup.getBounds is not a function` —

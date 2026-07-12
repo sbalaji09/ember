@@ -5,10 +5,10 @@
     "geocoded_lat": 34.067528145226,
     "geocoded_lng": -118.783487309123,
     "ring_origin": {
-      "lat": 34.067528145226,
-      "lng": -118.783487309123,
-      "source": "geocoded_point_fixed_radius_fallback",
-      "parcel_aware": false
+      "lat": 34.06809926272063,
+      "lng": -118.78317858262062,
+      "source": "parcel_centroid",
+      "parcel_aware": true
     },
     "parcel_address": {
       "field": "parcel_address",
@@ -32,6 +32,17 @@
       "dataset_vintage": "2026-06-24",
       "point": null
     },
+    "parcel_boundary_geojson": {
+      "field": "parcel_boundary_geojson",
+      "value": "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[-118.783267,34.067259],[-118.7832625,34.0672425],[-118.78319,34.0672445],[-118.7832645,34.0676315],[-118.783266,34.067637],[-118.7832675,34.0676435],[-118.7832695,34.06765],[-118.783272,34.067657],[-118.7832745,34.067663],[-118.7832775,34.0676695],[-118.7832805,34.0676755],[-118.783284,34.0676815],[-118.783288,34.0676875],[-118.783292,34.067693],[-118.7832965,34.0676985],[-118.783301,34.0677035],[-118.783306,34.0677085],[-118.7833115,34.067713],[-118.7833165,34.0677175],[-118.783322,34.0677215],[-118.783328,34.0677255],[-118.783334,34.067729],[-118.78334,34.0677325],[-118.7833465,34.0677355],[-118.7833525,34.067738],[-118.7833595,34.0677405],[-118.783366,34.0677425],[-118.7833725,34.067744],[-118.7833795,34.0677455],[-118.7833865,34.0677465],[-118.783393,34.067747],[-118.7834,34.0677475],[-118.783407,34.0677475],[-118.783414,34.067747],[-118.783421,34.0677465],[-118.783428,34.0677455],[-118.7834345,34.067744],[-118.7834415,34.0677425],[-118.783448,34.0677405],[-118.7834545,34.067738],[-118.783461,34.0677355],[-118.7834675,34.0677325],[-118.7834735,34.0677295],[-118.7834795,34.067726],[-118.783485,34.067722],[-118.7834905,34.067718],[-118.783496,34.0677135],[-118.783501,34.0677085],[-118.783506,34.067704],[-118.783511,34.0676985],[-118.7835155,34.0676935],[-118.7835195,34.067688],[-118.7835235,34.067682],[-118.783527,34.067676],[-118.78353,34.06767],[-118.783533,34.0676635],[-118.783536,34.0676575],[-118.783538,34.0676505],[-118.78354,34.067644],[-118.783542,34.0676375],[-118.783543,34.0676305],[-118.7835445,34.0676235],[-118.783545,34.067617],[-118.7835455,34.06761],[-118.7835455,34.067603],[-118.783545,34.067596],[-118.7835445,34.067589],[-118.7835435,34.067582],[-118.783542,34.0675755],[-118.7835405,34.0675685],[-118.7835385,34.067562],[-118.783536,34.0675555],[-118.7835335,34.067549],[-118.7835305,34.0675425],[-118.783527,34.0675365],[-118.7835235,34.0675305],[-118.7835195,34.067525],[-118.7835155,34.0675195],[-118.783511,34.067514],[-118.7835065,34.0675085],[-118.783421,34.0674605],[-118.7834105,34.0674535],[-118.783396,34.067443],[-118.783382,34.0674325],[-118.783369,34.067421],[-118.783356,34.0674085],[-118.783344,34.067396],[-118.7833325,34.0673825],[-118.783322,34.0673685],[-118.7833115,34.0673545],[-118.7833025,34.0673395],[-118.7832935,34.067324],[-118.783286,34.0673085],[-118.7832785,34.0672925],[-118.7832725,34.067276],[-118.783267,34.067259]]],[[[-118.782717,34.067829],[-118.782711,34.067843],[-118.782493,34.068291],[-118.7824925,34.0683445],[-118.7825485,34.0683715],[-118.782758,34.0683765],[-118.7827715,34.0683775],[-118.782789,34.0683795],[-118.7828065,34.068382],[-118.7828235,34.068386],[-118.7828405,34.06839],[-118.7828575,34.0683955],[-118.7828735,34.0684015],[-118.78289,34.0684085],[-118.7829055,34.068416],[-118.782921,34.0684245],[-118.782936,34.0684335],[-118.7829505,34.0684435],[-118.7829645,34.068454],[-118.782978,34.068465],[-118.7829905,34.068477],[-118.783003,34.0684895],[-118.7831475,34.068684],[-118.7831805,34.0687265],[-118.7832235,34.0687625],[-118.783498,34.068954],[-118.78356,34.0690125],[-118.7836005,34.069083],[-118.783627,34.0691655],[-118.783617,34.0688205],[-118.783589,34.0678615],[-118.7835865,34.067863],[-118.7835705,34.067871],[-118.7835545,34.0678785],[-118.783538,34.067885],[-118.783521,34.0678905],[-118.7835035,34.0678955],[-118.7834865,34.0678995],[-118.7834685,34.0679025],[-118.783451,34.067905],[-118.783433,34.0679065],[-118.7834155,34.067907],[-118.7833975,34.0679065],[-118.7833795,34.0679055],[-118.783362,34.0679035],[-118.7833445,34.0679005],[-118.783327,34.0678965],[-118.7833095,34.067892],[-118.7832925,34.0678865],[-118.783276,34.0678805],[-118.7832595,34.067873],[-118.7832435,34.0678655],[-118.783228,34.0678565],[-118.783213,34.067847],[-118.783198,34.067837],[-118.783184,34.067826],[-118.7831705,34.0678145],[-118.7831575,34.0678025],[-118.783145,34.0677895],[-118.783133,34.067776],[-118.783122,34.067762],[-118.7831115,34.0677475],[-118.783102,34.0677325],[-118.783093,34.067717],[-118.783085,34.067701],[-118.7830775,34.067685],[-118.783071,34.067668],[-118.7830655,34.0676515],[-118.782988,34.067245],[-118.7826095,34.067247],[-118.7827225,34.067611],[-118.7827265,34.0676245],[-118.7827305,34.0676385],[-118.782734,34.0676535],[-118.7827365,34.067668],[-118.7827385,34.067683],[-118.7827395,34.0676975],[-118.78274,34.0677125],[-118.7827395,34.0677275],[-118.7827385,34.0677425],[-118.7827365,34.0677575],[-118.782734,34.067772],[-118.782731,34.0677865],[-118.782727,34.067801],[-118.7827225,34.067815],[-118.782717,34.067829]]]]}",
+      "status": "ok",
+      "source": "REGRID",
+      "source_url": "https://app.regrid.com/api/v2/parcels/point",
+      "confidence": "high",
+      "fetched_at": "2026-07-12T18:36:45.232392+00:00",
+      "dataset_vintage": "2026-06-24",
+      "point": null
+    },
     "tract_geoid": {
       "field": "tract_geoid",
       "value": "06037800410",
@@ -45,7 +56,7 @@
     }
   },
   "overall": {
-    "composite": 0.3209305717831369,
+    "composite": 0.37284515505597327,
     "band": "Moderate",
     "drivers": {
       "wildfire_annual_frequency": {
@@ -65,8 +76,8 @@
         }
       },
       "max_directional_threat": {
-        "raw": 1.1473803716844317,
-        "normalized": 0.6374335398246843,
+        "raw": 1.45886787132145,
+        "normalized": 0.8104821507341389,
         "weight": 0.3,
         "citation": null
       },
@@ -151,7 +162,7 @@
       "dataset_vintage": "FEMA National Risk Index per-tract annualized frequencies (local table; NOAA SPC/NCEI/Vaisala source data)",
       "point": null
     },
-    "mean_fuel_score": 0.28756557709466596,
+    "mean_fuel_score": 0.28823972684755267,
     "thresholds": {
       "wildfire_history_present": 0.001,
       "low_current_fuel_mean_score": 0.16
@@ -166,7 +177,7 @@
       "source": "USGS_3DEP_COG",
       "source_url": "https://www.usgs.gov/3d-elevation-program",
       "confidence": "medium",
-      "fetched_at": "2026-07-12T18:36:45.014818+00:00",
+      "fetched_at": "2026-07-12T20:46:02.006204+00:00",
       "dataset_vintage": null,
       "point": null
     },
@@ -174,17 +185,17 @@
     "top_threats": [
       {
         "label": "SW",
-        "directional_threat": 1.1474,
-        "fuel_score": 0.2868,
-        "slope_multiplier": 4.0,
-        "avg_slope_degrees": 30.838261286417644
+        "directional_threat": 1.4589,
+        "fuel_score": 0.4123,
+        "slope_multiplier": 3.538,
+        "avg_slope_degrees": 18.23126157124837
       },
       {
         "label": "W",
-        "directional_threat": 1.0875,
-        "fuel_score": 0.2719,
+        "directional_threat": 1.0998,
+        "fuel_score": 0.275,
         "slope_multiplier": 4.0,
-        "avg_slope_degrees": 22.9725341796875
+        "avg_slope_degrees": 30.03010368347168
       }
     ],
     "slope_threat_window_deg": 45
@@ -192,10 +203,11 @@
   "bearings": {
     "N": {
       "label": "N",
-      "fuel_score": 0.2702,
-      "avg_slope_degrees": 23.180880228678387,
+      "bearing_deg": 0,
+      "fuel_score": 0.2865,
+      "avg_slope_degrees": 31.556004842122395,
       "slope_multiplier": 1.0,
-      "directional_threat": 0.2702,
+      "directional_threat": 0.2865,
       "gap_count": 0,
       "gaps": [],
       "citations": [
@@ -206,11 +218,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:49.719008+00:00",
+          "fetched_at": "2026-07-12T20:46:07.795827+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.06842746683192,
-            "lng": -118.783487309123
+            "lat": 34.06899858432655,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -220,39 +232,39 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:49.719693+00:00",
+          "fetched_at": "2026-07-12T20:46:07.796958+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.06842746683192,
-            "lng": -118.783487309123
+            "lat": 34.06899858432655,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.7464863061904907,
+          "value": 0.5827472805976868,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:51.857859+00:00",
+          "fetched_at": "2026-07-12T20:46:10.211692+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.06842746683192,
-            "lng": -118.783487309123
+            "lat": 34.06899858432655,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "slope_degrees",
-          "value": 19.509469985961914,
+          "value": 23.841243743896484,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:49.837257+00:00",
+          "fetched_at": "2026-07-12T20:46:07.912626+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.06842746683192,
-            "lng": -118.783487309123
+            "lat": 34.06899858432655,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -262,11 +274,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.183592+00:00",
+          "fetched_at": "2026-07-12T20:46:06.247312+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.0697764492408,
-            "lng": -118.783487309123
+            "lat": 34.07034756673543,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -276,39 +288,39 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:50.184363+00:00",
+          "fetched_at": "2026-07-12T20:46:06.252570+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.0697764492408,
-            "lng": -118.783487309123
+            "lat": 34.07034756673543,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.6729222536087036,
+          "value": 0.5610930323600769,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:51.919868+00:00",
+          "fetched_at": "2026-07-12T20:46:08.042225+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.0697764492408,
-            "lng": -118.783487309123
+            "lat": 34.07034756673543,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "slope_degrees",
-          "value": 34.582645416259766,
+          "value": 37.73651123046875,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.721006+00:00",
+          "fetched_at": "2026-07-12T20:46:06.534752+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.0697764492408,
-            "lng": -118.783487309123
+            "lat": 34.07034756673543,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -318,11 +330,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.434842+00:00",
+          "fetched_at": "2026-07-12T20:46:06.882830+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.07202475325559,
-            "lng": -118.783487309123
+            "lat": 34.07259587075023,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -332,108 +344,53 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:50.439895+00:00",
+          "fetched_at": "2026-07-12T20:46:06.885205+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.07202475325559,
-            "lng": -118.783487309123
+            "lat": 34.07259587075023,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.5551344752311707,
+          "value": 0.5614919066429138,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.484893+00:00",
+          "fetched_at": "2026-07-12T20:46:08.952541+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.07202475325559,
-            "lng": -118.783487309123
+            "lat": 34.07259587075023,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "slope_degrees",
-          "value": 15.450525283813477,
+          "value": 33.09025955200195,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.840350+00:00",
+          "fetched_at": "2026-07-12T20:46:07.757204+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.07202475325559,
-            "lng": -118.783487309123
+            "lat": 34.07259587075023,
+            "lng": -118.78317858262064
           }
         }
       ]
     },
     "NE": {
       "label": "NE",
-      "fuel_score": 0.2593,
-      "avg_slope_degrees": 18.11744213104248,
+      "bearing_deg": 45,
+      "fuel_score": 0.2448,
+      "avg_slope_degrees": 19.317538579305012,
       "slope_multiplier": 1.0,
-      "directional_threat": 0.2593,
+      "directional_threat": 0.2448,
       "gap_count": 0,
       "gaps": [],
       "citations": [
-        {
-          "field": "lcms_class",
-          "value": "Trees",
-          "status": "ok",
-          "source": "USFS_LCMS",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.456630+00:00",
-          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
-          "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78271963877694
-          }
-        },
-        {
-          "field": "tree_canopy_pct",
-          "value": 30.0,
-          "status": "ok",
-          "source": "USFS_NLCD_TCC",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:50.458047+00:00",
-          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
-          "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78271963877694
-          }
-        },
-        {
-          "field": "ndvi_current",
-          "value": 0.6738284826278687,
-          "status": "ok",
-          "source": "COPERNICUS_S2_SR_HARMONIZED",
-          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.847089+00:00",
-          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
-          "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78271963877694
-          }
-        },
-        {
-          "field": "slope_degrees",
-          "value": 20.29633331298828,
-          "status": "ok",
-          "source": "USGS_3DEP_COG",
-          "source_url": "https://www.usgs.gov/3d-elevation-program",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.885562+00:00",
-          "dataset_vintage": null,
-          "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78271963877694
-          }
-        },
         {
           "field": "lcms_class",
           "value": "Grass/Forb/Herb",
@@ -441,11 +398,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.562113+00:00",
+          "fetched_at": "2026-07-12T20:46:07.798117+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.7815681116512
+            "lat": 34.06873517674019,
+            "lng": -118.78241090709984
           }
         },
         {
@@ -455,39 +412,39 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:50.562948+00:00",
+          "fetched_at": "2026-07-12T20:46:07.798933+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.7815681116512
+            "lat": 34.06873517674019,
+            "lng": -118.78241090709984
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.32929059863090515,
+          "value": 0.6081591248512268,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.884929+00:00",
+          "fetched_at": "2026-07-12T20:46:09.244718+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.7815681116512
+            "lat": 34.06873517674019,
+            "lng": -118.78241090709984
           }
         },
         {
           "field": "slope_degrees",
-          "value": 28.388219833374023,
+          "value": 19.202993392944336,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:51.144121+00:00",
+          "fetched_at": "2026-07-12T20:46:07.916384+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.7815681116512
+            "lat": 34.06873517674019,
+            "lng": -118.78241090709984
           }
         },
         {
@@ -497,11 +454,67 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.748399+00:00",
+          "fetched_at": "2026-07-12T20:46:06.651464+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.77964884215422
+            "lat": 34.06968903882002,
+            "lng": -118.78125937221144
+          }
+        },
+        {
+          "field": "tree_canopy_pct",
+          "value": 13.0,
+          "status": "ok",
+          "source": "USFS_NLCD_TCC",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:06.652231+00:00",
+          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
+          "point": {
+            "lat": 34.06968903882002,
+            "lng": -118.78125937221144
+          }
+        },
+        {
+          "field": "ndvi_current",
+          "value": 0.25636911392211914,
+          "status": "ok",
+          "source": "COPERNICUS_S2_SR_HARMONIZED",
+          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:08.613642+00:00",
+          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
+          "point": {
+            "lat": 34.06968903882002,
+            "lng": -118.78125937221144
+          }
+        },
+        {
+          "field": "slope_degrees",
+          "value": 25.148969650268555,
+          "status": "ok",
+          "source": "USGS_3DEP_COG",
+          "source_url": "https://www.usgs.gov/3d-elevation-program",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:06.965255+00:00",
+          "dataset_vintage": null,
+          "point": {
+            "lat": 34.06968903882002,
+            "lng": -118.78125937221144
+          }
+        },
+        {
+          "field": "lcms_class",
+          "value": "Trees",
+          "status": "ok",
+          "source": "USFS_LCMS",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:07.779774+00:00",
+          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
+          "point": {
+            "lat": 34.0712787850862,
+            "lng": -118.7793400897751
           }
         },
         {
@@ -511,49 +524,230 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:50.749143+00:00",
+          "fetched_at": "2026-07-12T20:46:07.780516+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.77964884215422
+            "lat": 34.0712787850862,
+            "lng": -118.7793400897751
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.6080042719841003,
+          "value": 0.7780959606170654,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.688240+00:00",
+          "fetched_at": "2026-07-12T20:46:08.987281+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.77964884215422
+            "lat": 34.0712787850862,
+            "lng": -118.7793400897751
           }
         },
         {
           "field": "slope_degrees",
-          "value": 5.667773246765137,
+          "value": 13.600652694702148,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:51.139790+00:00",
+          "fetched_at": "2026-07-12T20:46:07.940246+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.77964884215422
+            "lat": 34.0712787850862,
+            "lng": -118.7793400897751
           }
         }
       ]
     },
     "E": {
       "label": "E",
-      "fuel_score": 0.2618,
-      "avg_slope_degrees": 21.95749060312907,
+      "bearing_deg": 90,
+      "fuel_score": 0.2627,
+      "avg_slope_degrees": 25.423027356465656,
       "slope_multiplier": 1.0,
-      "directional_threat": 0.2618,
+      "directional_threat": 0.2627,
+      "gap_count": 0,
+      "gaps": [],
+      "citations": [
+        {
+          "field": "lcms_class",
+          "value": "Grass/Forb/Herb",
+          "status": "ok",
+          "source": "USFS_LCMS",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:06.945831+00:00",
+          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
+          "point": {
+            "lat": 34.06809925794778,
+            "lng": -118.78209293363606
+          }
+        },
+        {
+          "field": "tree_canopy_pct",
+          "value": 14.0,
+          "status": "ok",
+          "source": "USFS_NLCD_TCC",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:06.947202+00:00",
+          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
+          "point": {
+            "lat": 34.06809925794778,
+            "lng": -118.78209293363606
+          }
+        },
+        {
+          "field": "ndvi_current",
+          "value": 0.5508197546005249,
+          "status": "ok",
+          "source": "COPERNICUS_S2_SR_HARMONIZED",
+          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:08.654601+00:00",
+          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
+          "point": {
+            "lat": 34.06809925794778,
+            "lng": -118.78209293363606
+          }
+        },
+        {
+          "field": "slope_degrees",
+          "value": 15.306852340698242,
+          "status": "ok",
+          "source": "USGS_3DEP_COG",
+          "source_url": "https://www.usgs.gov/3d-elevation-program",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:07.364971+00:00",
+          "dataset_vintage": null,
+          "point": {
+            "lat": 34.06809925794778,
+            "lng": -118.78209293363606
+          }
+        },
+        {
+          "field": "lcms_class",
+          "value": "Trees",
+          "status": "ok",
+          "source": "USFS_LCMS",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:06.923126+00:00",
+          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
+          "point": {
+            "lat": 34.06809923289032,
+            "lng": -118.78046446015976
+          }
+        },
+        {
+          "field": "tree_canopy_pct",
+          "value": 17.0,
+          "status": "ok",
+          "source": "USFS_NLCD_TCC",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:06.929577+00:00",
+          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
+          "point": {
+            "lat": 34.06809923289032,
+            "lng": -118.78046446015976
+          }
+        },
+        {
+          "field": "ndvi_current",
+          "value": 0.2871035635471344,
+          "status": "ok",
+          "source": "COPERNICUS_S2_SR_HARMONIZED",
+          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:08.885617+00:00",
+          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
+          "point": {
+            "lat": 34.06809923289032,
+            "lng": -118.78046446015976
+          }
+        },
+        {
+          "field": "slope_degrees",
+          "value": 14.052363395690918,
+          "status": "ok",
+          "source": "USGS_3DEP_COG",
+          "source_url": "https://www.usgs.gov/3d-elevation-program",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:47:29.031692+00:00",
+          "dataset_vintage": null,
+          "point": {
+            "lat": 34.06809923289032,
+            "lng": -118.78046446015976
+          }
+        },
+        {
+          "field": "lcms_class",
+          "value": "Trees",
+          "status": "ok",
+          "source": "USFS_LCMS",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:08.281376+00:00",
+          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
+          "point": {
+            "lat": 34.06809914339939,
+            "lng": -118.77775033770274
+          }
+        },
+        {
+          "field": "tree_canopy_pct",
+          "value": 42.0,
+          "status": "ok",
+          "source": "USFS_NLCD_TCC",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:08.282304+00:00",
+          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
+          "point": {
+            "lat": 34.06809914339939,
+            "lng": -118.77775033770274
+          }
+        },
+        {
+          "field": "ndvi_current",
+          "value": 0.5881572961807251,
+          "status": "ok",
+          "source": "COPERNICUS_S2_SR_HARMONIZED",
+          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:09.385657+00:00",
+          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
+          "point": {
+            "lat": 34.06809914339939,
+            "lng": -118.77775033770274
+          }
+        },
+        {
+          "field": "slope_degrees",
+          "value": 46.90986633300781,
+          "status": "ok",
+          "source": "USGS_3DEP_COG",
+          "source_url": "https://www.usgs.gov/3d-elevation-program",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:08.312438+00:00",
+          "dataset_vintage": null,
+          "point": {
+            "lat": 34.06809914339939,
+            "lng": -118.77775033770274
+          }
+        }
+      ]
+    },
+    "SE": {
+      "label": "SE",
+      "bearing_deg": 135,
+      "fuel_score": 0.26,
+      "avg_slope_degrees": 21.430474599202473,
+      "slope_multiplier": 1.0,
+      "directional_threat": 0.26,
       "gap_count": 0,
       "gaps": [],
       "citations": [
@@ -567,8 +761,8 @@
           "fetched_at": "2026-07-12T18:36:50.482864+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78240166745634
+            "lat": 34.067463343928225,
+            "lng": -118.7824109186233
           }
         },
         {
@@ -581,8 +775,8 @@
           "fetched_at": "2026-07-12T18:36:50.484557+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78240166745634
+            "lat": 34.067463343928225,
+            "lng": -118.7824109186233
           }
         },
         {
@@ -592,25 +786,25 @@
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.693174+00:00",
+          "fetched_at": "2026-07-12T20:46:09.845658+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78240166745634
+            "lat": 34.067463343928225,
+            "lng": -118.7824109186233
           }
         },
         {
           "field": "slope_degrees",
-          "value": 15.970133781433105,
+          "value": 13.410392761230469,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:51.147443+00:00",
+          "fetched_at": "2026-07-12T20:46:08.915659+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78240166745634
+            "lat": 34.067463343928225,
+            "lng": -118.7824109186233
           }
         },
         {
@@ -620,53 +814,53 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.489484+00:00",
+          "fetched_at": "2026-07-12T20:46:08.788581+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.7807732049569
+            "lat": 34.066509456790925,
+            "lng": -118.78125944423296
           }
         },
         {
           "field": "tree_canopy_pct",
-          "value": 24.0,
+          "value": 26.0,
           "status": "ok",
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:50.490392+00:00",
+          "fetched_at": "2026-07-12T20:46:08.789314+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.7807732049569
+            "lat": 34.066509456790925,
+            "lng": -118.78125944423296
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.5956204533576965,
+          "value": 0.6190935373306274,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.594667+00:00",
+          "fetched_at": "2026-07-12T20:46:10.376856+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.7807732049569
+            "lat": 34.066509456790925,
+            "lng": -118.78125944423296
           }
         },
         {
           "field": "slope_degrees",
-          "value": 15.36155891418457,
+          "value": 21.96159553527832,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:50.885919+00:00",
+          "fetched_at": "2026-07-12T20:46:08.921387+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.7807732049569
+            "lat": 34.066509456790925,
+            "lng": -118.78125944423296
           }
         },
         {
@@ -676,190 +870,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:51.975905+00:00",
+          "fetched_at": "2026-07-12T20:46:08.989507+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.77805910079462
-          }
-        },
-        {
-          "field": "tree_canopy_pct",
-          "value": 42.0,
-          "status": "ok",
-          "source": "USFS_NLCD_TCC",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:51.976618+00:00",
-          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
-          "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.77805910079462
-          }
-        },
-        {
-          "field": "ndvi_current",
-          "value": 0.7410191893577576,
-          "status": "ok",
-          "source": "COPERNICUS_S2_SR_HARMONIZED",
-          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.686539+00:00",
-          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
-          "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.77805910079462
-          }
-        },
-        {
-          "field": "slope_degrees",
-          "value": 34.54077911376953,
-          "status": "ok",
-          "source": "USGS_3DEP_COG",
-          "source_url": "https://www.usgs.gov/3d-elevation-program",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.012752+00:00",
-          "dataset_vintage": null,
-          "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.77805910079462
-          }
-        }
-      ]
-    },
-    "SE": {
-      "label": "SE",
-      "fuel_score": 0.3368,
-      "avg_slope_degrees": 24.867373784383137,
-      "slope_multiplier": 1.0,
-      "directional_threat": 0.3368,
-      "gap_count": 0,
-      "gaps": [],
-      "citations": [
-        {
-          "field": "lcms_class",
-          "value": "Trees",
-          "status": "ok",
-          "source": "USFS_LCMS",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.030218+00:00",
-          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
-          "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78271965030005
-          }
-        },
-        {
-          "field": "tree_canopy_pct",
-          "value": 19.0,
-          "status": "ok",
-          "source": "USFS_NLCD_TCC",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.031014+00:00",
-          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
-          "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78271965030005
-          }
-        },
-        {
-          "field": "ndvi_current",
-          "value": 0.3946051001548767,
-          "status": "ok",
-          "source": "COPERNICUS_S2_SR_HARMONIZED",
-          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.765599+00:00",
-          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
-          "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78271965030005
-          }
-        },
-        {
-          "field": "slope_degrees",
-          "value": 23.475645065307617,
-          "status": "ok",
-          "source": "USGS_3DEP_COG",
-          "source_url": "https://www.usgs.gov/3d-elevation-program",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.164288+00:00",
-          "dataset_vintage": null,
-          "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78271965030005
-          }
-        },
-        {
-          "field": "lcms_class",
-          "value": "Trees",
-          "status": "ok",
-          "source": "USFS_LCMS",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.609572+00:00",
-          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
-          "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78156818367066
-          }
-        },
-        {
-          "field": "tree_canopy_pct",
-          "value": 30.0,
-          "status": "ok",
-          "source": "USFS_NLCD_TCC",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.610380+00:00",
-          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
-          "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78156818367066
-          }
-        },
-        {
-          "field": "ndvi_current",
-          "value": 0.6119524240493774,
-          "status": "ok",
-          "source": "COPERNICUS_S2_SR_HARMONIZED",
-          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.698528+00:00",
-          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
-          "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78156818367066
-          }
-        },
-        {
-          "field": "slope_degrees",
-          "value": 17.593490600585938,
-          "status": "ok",
-          "source": "USGS_3DEP_COG",
-          "source_url": "https://www.usgs.gov/3d-elevation-program",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.843695+00:00",
-          "dataset_vintage": null,
-          "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78156818367066
-          }
-        },
-        {
-          "field": "lcms_class",
-          "value": "Trees",
-          "status": "ok",
-          "source": "USFS_LCMS",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.707453+00:00",
-          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
-          "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.77964913023212
+            "lat": 34.064919621033816,
+            "lng": -118.77934037786112
           }
         },
         {
@@ -869,49 +884,50 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.708161+00:00",
+          "fetched_at": "2026-07-12T20:46:08.990400+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.77964913023212
+            "lat": 34.064919621033816,
+            "lng": -118.77934037786112
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.728715717792511,
+          "value": 0.7262037992477417,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.904610+00:00",
+          "fetched_at": "2026-07-12T20:46:10.357095+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.77964913023212
+            "lat": 34.064919621033816,
+            "lng": -118.77934037786112
           }
         },
         {
           "field": "slope_degrees",
-          "value": 33.53298568725586,
+          "value": 28.919435501098633,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.849611+00:00",
+          "fetched_at": "2026-07-12T20:46:09.083492+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.77964913023212
+            "lat": 34.064919621033816,
+            "lng": -118.77934037786112
           }
         }
       ]
     },
     "S": {
       "label": "S",
-      "fuel_score": 0.3402,
-      "avg_slope_degrees": 24.12503178914388,
+      "bearing_deg": 180,
+      "fuel_score": 0.279,
+      "avg_slope_degrees": 24.111509323120117,
       "slope_multiplier": 1.0,
-      "directional_threat": 0.3402,
+      "directional_threat": 0.279,
       "gap_count": 0,
       "gaps": [],
       "citations": [
@@ -922,11 +938,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.030218+00:00",
+          "fetched_at": "2026-07-12T18:36:44.493010+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.066628823620086,
-            "lng": -118.783487309123
+            "lat": 34.06719994111471,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -936,39 +952,39 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.031014+00:00",
+          "fetched_at": "2026-07-12T18:36:44.514585+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.066628823620086,
-            "lng": -118.783487309123
+            "lat": 34.06719994111471,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.3946051001548767,
+          "value": 0.540466845035553,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.765599+00:00",
+          "fetched_at": "2026-07-12T20:46:11.712843+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.066628823620086,
-            "lng": -118.783487309123
+            "lat": 34.06719994111471,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "slope_degrees",
-          "value": 23.475645065307617,
+          "value": 25.697813034057617,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.164288+00:00",
+          "fetched_at": "2026-07-12T20:46:09.220578+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.066628823620086,
-            "lng": -118.783487309123
+            "lat": 34.06719994111471,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -978,53 +994,53 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.886503+00:00",
+          "fetched_at": "2026-07-12T20:46:09.125675+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.0652798412112,
-            "lng": -118.783487309123
+            "lat": 34.06585095870583,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "tree_canopy_pct",
-          "value": 30.0,
+          "value": 25.0,
           "status": "ok",
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.887247+00:00",
+          "fetched_at": "2026-07-12T20:46:09.126521+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.0652798412112,
-            "lng": -118.783487309123
+            "lat": 34.06585095870583,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.5832566618919373,
+          "value": 0.7814465165138245,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:37:23.304847+00:00",
+          "fetched_at": "2026-07-12T20:46:10.397648+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.0652798412112,
-            "lng": -118.783487309123
+            "lat": 34.06585095870583,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "slope_degrees",
-          "value": 20.070476531982422,
+          "value": 18.463787078857422,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.902513+00:00",
+          "fetched_at": "2026-07-12T20:46:09.234348+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.0652798412112,
-            "lng": -118.783487309123
+            "lat": 34.06585095870583,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -1034,11 +1050,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.957945+00:00",
+          "fetched_at": "2026-07-12T20:46:09.361920+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.06303153719641,
-            "lng": -118.783487309123
+            "lat": 34.06360265469104,
+            "lng": -118.78317858262064
           }
         },
         {
@@ -1048,49 +1064,50 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:52.958660+00:00",
+          "fetched_at": "2026-07-12T20:46:09.362619+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.06303153719641,
-            "lng": -118.783487309123
+            "lat": 34.06360265469104,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.7059503197669983,
+          "value": 0.6586381196975708,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:54.514856+00:00",
+          "fetched_at": "2026-07-12T20:46:10.635213+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.06303153719641,
-            "lng": -118.783487309123
+            "lat": 34.06360265469104,
+            "lng": -118.78317858262064
           }
         },
         {
           "field": "slope_degrees",
-          "value": 28.8289737701416,
+          "value": 28.172927856445312,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:52.996070+00:00",
+          "fetched_at": "2026-07-12T20:46:09.403772+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.06303153719641,
-            "lng": -118.783487309123
+            "lat": 34.06360265469104,
+            "lng": -118.78317858262064
           }
         }
       ]
     },
     "SW": {
       "label": "SW",
-      "fuel_score": 0.2868,
-      "avg_slope_degrees": 30.838261286417644,
-      "slope_multiplier": 4.0,
-      "directional_threat": 1.1474,
+      "bearing_deg": 225,
+      "fuel_score": 0.4123,
+      "avg_slope_degrees": 18.23126157124837,
+      "slope_multiplier": 3.538,
+      "directional_threat": 1.4589,
       "gap_count": 0,
       "gaps": [],
       "citations": [
@@ -1101,11 +1118,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:53.037311+00:00",
+          "fetched_at": "2026-07-12T20:46:09.499198+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78425496794596
+            "lat": 34.067463343928225,
+            "lng": -118.78394624661797
           }
         },
         {
@@ -1115,39 +1132,39 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.038029+00:00",
+          "fetched_at": "2026-07-12T20:46:09.499893+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78425496794596
+            "lat": 34.067463343928225,
+            "lng": -118.78394624661797
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.6121376156806946,
+          "value": 0.3026505410671234,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:54.347268+00:00",
+          "fetched_at": "2026-07-12T20:46:10.700510+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78425496794596
+            "lat": 34.067463343928225,
+            "lng": -118.78394624661797
           }
         },
         {
           "field": "slope_degrees",
-          "value": 27.448291778564453,
+          "value": 13.165791511535645,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:53.075037+00:00",
+          "fetched_at": "2026-07-12T20:46:09.694723+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.066892226433644,
-            "lng": -118.78425496794596
+            "lat": 34.067463343928225,
+            "lng": -118.78394624661797
           }
         },
         {
@@ -1157,53 +1174,53 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:53.879872+00:00",
+          "fetched_at": "2026-07-12T20:46:09.957652+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78540643457536
+            "lat": 34.066509456790925,
+            "lng": -118.7850977210083
           }
         },
         {
           "field": "tree_canopy_pct",
-          "value": 35.0,
+          "value": 24.0,
           "status": "ok",
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.883975+00:00",
+          "fetched_at": "2026-07-12T20:46:09.958403+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78540643457536
+            "lat": 34.066509456790925,
+            "lng": -118.7850977210083
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.7335618734359741,
+          "value": 0.5195871591567993,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:55.263131+00:00",
+          "fetched_at": "2026-07-12T20:46:12.359590+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78540643457536
+            "lat": 34.066509456790925,
+            "lng": -118.7850977210083
           }
         },
         {
           "field": "slope_degrees",
-          "value": 18.100374221801758,
+          "value": 14.45090389251709,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.058317+00:00",
+          "fetched_at": "2026-07-12T20:46:09.993086+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.065938339296615,
-            "lng": -118.78540643457536
+            "lat": 34.066509456790925,
+            "lng": -118.7850977210083
           }
         },
         {
@@ -1213,11 +1230,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:53.849541+00:00",
+          "fetched_at": "2026-07-12T20:46:10.328264+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.7873254880139
+            "lat": 34.064919621033816,
+            "lng": -118.78701678738015
           }
         },
         {
@@ -1227,228 +1244,50 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.850270+00:00",
+          "fetched_at": "2026-07-12T20:46:10.329225+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.7873254880139
+            "lat": 34.064919621033816,
+            "lng": -118.78701678738015
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.653462827205658,
+          "value": 0.6161035299301147,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:55.218356+00:00",
+          "fetched_at": "2026-07-12T20:46:12.163298+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.7873254880139
+            "lat": 34.064919621033816,
+            "lng": -118.78701678738015
           }
         },
         {
           "field": "slope_degrees",
-          "value": 46.96611785888672,
+          "value": 27.077089309692383,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:53.884880+00:00",
+          "fetched_at": "2026-07-12T20:46:10.371837+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.06434850354047,
-            "lng": -118.7873254880139
+            "lat": 34.064919621033816,
+            "lng": -118.78701678738015
           }
         }
       ]
     },
     "W": {
       "label": "W",
-      "fuel_score": 0.2719,
-      "avg_slope_degrees": 22.9725341796875,
+      "bearing_deg": 270,
+      "fuel_score": 0.275,
+      "avg_slope_degrees": 30.03010368347168,
       "slope_multiplier": 4.0,
-      "directional_threat": 1.0875,
-      "gap_count": 0,
-      "gaps": [],
-      "citations": [
-        {
-          "field": "lcms_class",
-          "value": "Trees",
-          "status": "ok",
-          "source": "USFS_LCMS",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:53.893705+00:00",
-          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
-          "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78457295078968
-          }
-        },
-        {
-          "field": "tree_canopy_pct",
-          "value": 28.0,
-          "status": "ok",
-          "source": "USFS_NLCD_TCC",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:53.894422+00:00",
-          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
-          "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78457295078968
-          }
-        },
-        {
-          "field": "ndvi_current",
-          "value": 0.691179096698761,
-          "status": "ok",
-          "source": "COPERNICUS_S2_SR_HARMONIZED",
-          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:55.008786+00:00",
-          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
-          "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78457295078968
-          }
-        },
-        {
-          "field": "slope_degrees",
-          "value": 25.34479331970215,
-          "status": "ok",
-          "source": "USGS_3DEP_COG",
-          "source_url": "https://www.usgs.gov/3d-elevation-program",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:53.933209+00:00",
-          "dataset_vintage": null,
-          "point": {
-            "lat": 34.067528140453256,
-            "lng": -118.78457295078968
-          }
-        },
-        {
-          "field": "lcms_class",
-          "value": "Trees",
-          "status": "ok",
-          "source": "USFS_LCMS",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.015337+00:00",
-          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
-          "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.78620141328912
-          }
-        },
-        {
-          "field": "tree_canopy_pct",
-          "value": 22.0,
-          "status": "ok",
-          "source": "USFS_NLCD_TCC",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:54.016098+00:00",
-          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
-          "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.78620141328912
-          }
-        },
-        {
-          "field": "ndvi_current",
-          "value": 0.779238760471344,
-          "status": "ok",
-          "source": "COPERNICUS_S2_SR_HARMONIZED",
-          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:55.363831+00:00",
-          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
-          "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.78620141328912
-          }
-        },
-        {
-          "field": "slope_degrees",
-          "value": 8.179407119750977,
-          "status": "ok",
-          "source": "USGS_3DEP_COG",
-          "source_url": "https://www.usgs.gov/3d-elevation-program",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.140332+00:00",
-          "dataset_vintage": null,
-          "point": {
-            "lat": 34.06752811539633,
-            "lng": -118.78620141328912
-          }
-        },
-        {
-          "field": "lcms_class",
-          "value": "Trees",
-          "status": "ok",
-          "source": "USFS_LCMS",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.463155+00:00",
-          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
-          "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.78891551745139
-          }
-        },
-        {
-          "field": "tree_canopy_pct",
-          "value": 37.0,
-          "status": "ok",
-          "source": "USFS_NLCD_TCC",
-          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:54.463852+00:00",
-          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
-          "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.78891551745139
-          }
-        },
-        {
-          "field": "ndvi_current",
-          "value": 0.6512048244476318,
-          "status": "ok",
-          "source": "COPERNICUS_S2_SR_HARMONIZED",
-          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
-          "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:56.414916+00:00",
-          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
-          "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.78891551745139
-          }
-        },
-        {
-          "field": "slope_degrees",
-          "value": 35.393402099609375,
-          "status": "ok",
-          "source": "USGS_3DEP_COG",
-          "source_url": "https://www.usgs.gov/3d-elevation-program",
-          "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.557178+00:00",
-          "dataset_vintage": null,
-          "point": {
-            "lat": 34.067528025907315,
-            "lng": -118.78891551745139
-          }
-        }
-      ]
-    },
-    "NW": {
-      "label": "NW",
-      "fuel_score": 0.2736,
-      "avg_slope_degrees": 31.197490692138672,
-      "slope_multiplier": 1.0,
-      "directional_threat": 0.2736,
+      "directional_threat": 1.0998,
       "gap_count": 0,
       "gaps": [],
       "citations": [
@@ -1462,8 +1301,8 @@
           "fetched_at": "2026-07-12T18:36:54.618381+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78425497946908
+            "lat": 34.06809925794778,
+            "lng": -118.78426423160519
           }
         },
         {
@@ -1476,36 +1315,36 @@
           "fetched_at": "2026-07-12T18:36:54.621253+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78425497946908
+            "lat": 34.06809925794778,
+            "lng": -118.78426423160519
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.5833579301834106,
+          "value": 0.6225131154060364,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:55.896959+00:00",
+          "fetched_at": "2026-07-12T20:46:43.117127+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78425497946908
+            "lat": 34.06809925794778,
+            "lng": -118.78426423160519
           }
         },
         {
           "field": "slope_degrees",
-          "value": 35.98987579345703,
+          "value": 20.703296661376953,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.655691+00:00",
+          "fetched_at": "2026-07-12T20:46:10.503193+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.06816405924562,
-            "lng": -118.78425497946908
+            "lat": 34.06809925794778,
+            "lng": -118.78426423160519
           }
         },
         {
@@ -1515,11 +1354,11 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.713388+00:00",
+          "fetched_at": "2026-07-12T20:46:10.499689+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.78540650659482
+            "lat": 34.06809923289032,
+            "lng": -118.7858927050815
           }
         },
         {
@@ -1529,39 +1368,39 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:54.714065+00:00",
+          "fetched_at": "2026-07-12T20:46:10.500522+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.78540650659482
+            "lat": 34.06809923289032,
+            "lng": -118.7858927050815
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.6629793047904968,
+          "value": 0.6405512690544128,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:57.532316+00:00",
+          "fetched_at": "2026-07-12T20:46:12.952807+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.78540650659482
+            "lat": 34.06809923289032,
+            "lng": -118.7858927050815
           }
         },
         {
           "field": "slope_degrees",
-          "value": 25.470745086669922,
+          "value": 31.080350875854492,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:54.745877+00:00",
+          "fetched_at": "2026-07-12T20:46:10.602530+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.069117921325706,
-            "lng": -118.78540650659482
+            "lat": 34.06809923289032,
+            "lng": -118.7858927050815
           }
         },
         {
@@ -1571,11 +1410,191 @@
           "source": "USFS_LCMS",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T19:08:06.394304+00:00",
+          "fetched_at": "2026-07-12T20:46:10.519413+00:00",
           "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.7873257760918
+            "lat": 34.06809914339939,
+            "lng": -118.78860682753852
+          }
+        },
+        {
+          "field": "tree_canopy_pct",
+          "value": 39.0,
+          "status": "ok",
+          "source": "USFS_NLCD_TCC",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:10.520086+00:00",
+          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
+          "point": {
+            "lat": 34.06809914339939,
+            "lng": -118.78860682753852
+          }
+        },
+        {
+          "field": "ndvi_current",
+          "value": 0.7971771955490112,
+          "status": "ok",
+          "source": "COPERNICUS_S2_SR_HARMONIZED",
+          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:12.658550+00:00",
+          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
+          "point": {
+            "lat": 34.06809914339939,
+            "lng": -118.78860682753852
+          }
+        },
+        {
+          "field": "slope_degrees",
+          "value": 38.306663513183594,
+          "status": "ok",
+          "source": "USGS_3DEP_COG",
+          "source_url": "https://www.usgs.gov/3d-elevation-program",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:10.562749+00:00",
+          "dataset_vintage": null,
+          "point": {
+            "lat": 34.06809914339939,
+            "lng": -118.78860682753852
+          }
+        }
+      ]
+    },
+    "NW": {
+      "label": "NW",
+      "bearing_deg": 315,
+      "fuel_score": 0.2857,
+      "avg_slope_degrees": 30.862329483032227,
+      "slope_multiplier": 1.0,
+      "directional_threat": 0.2857,
+      "gap_count": 0,
+      "gaps": [],
+      "citations": [
+        {
+          "field": "lcms_class",
+          "value": "Trees",
+          "status": "ok",
+          "source": "USFS_LCMS",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T18:36:49.719008+00:00",
+          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
+          "point": {
+            "lat": 34.06873517674019,
+            "lng": -118.78394625814143
+          }
+        },
+        {
+          "field": "tree_canopy_pct",
+          "value": 30.0,
+          "status": "ok",
+          "source": "USFS_NLCD_TCC",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T18:36:49.719693+00:00",
+          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
+          "point": {
+            "lat": 34.06873517674019,
+            "lng": -118.78394625814143
+          }
+        },
+        {
+          "field": "ndvi_current",
+          "value": 0.6630648374557495,
+          "status": "ok",
+          "source": "COPERNICUS_S2_SR_HARMONIZED",
+          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:12.692137+00:00",
+          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
+          "point": {
+            "lat": 34.06873517674019,
+            "lng": -118.78394625814143
+          }
+        },
+        {
+          "field": "slope_degrees",
+          "value": 35.96611404418945,
+          "status": "ok",
+          "source": "USGS_3DEP_COG",
+          "source_url": "https://www.usgs.gov/3d-elevation-program",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:10.788567+00:00",
+          "dataset_vintage": null,
+          "point": {
+            "lat": 34.06873517674019,
+            "lng": -118.78394625814143
+          }
+        },
+        {
+          "field": "lcms_class",
+          "value": "Trees",
+          "status": "ok",
+          "source": "USFS_LCMS",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:10.887524+00:00",
+          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
+          "point": {
+            "lat": 34.06968903882002,
+            "lng": -118.78509779302983
+          }
+        },
+        {
+          "field": "tree_canopy_pct",
+          "value": 36.0,
+          "status": "ok",
+          "source": "USFS_NLCD_TCC",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:10.888269+00:00",
+          "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
+          "point": {
+            "lat": 34.06968903882002,
+            "lng": -118.78509779302983
+          }
+        },
+        {
+          "field": "ndvi_current",
+          "value": 0.6904301047325134,
+          "status": "ok",
+          "source": "COPERNICUS_S2_SR_HARMONIZED",
+          "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
+          "confidence": "high",
+          "fetched_at": "2026-07-12T20:46:12.804136+00:00",
+          "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
+          "point": {
+            "lat": 34.06968903882002,
+            "lng": -118.78509779302983
+          }
+        },
+        {
+          "field": "slope_degrees",
+          "value": 33.05853271484375,
+          "status": "ok",
+          "source": "USGS_3DEP_COG",
+          "source_url": "https://www.usgs.gov/3d-elevation-program",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:11.171936+00:00",
+          "dataset_vintage": null,
+          "point": {
+            "lat": 34.06968903882002,
+            "lng": -118.78509779302983
+          }
+        },
+        {
+          "field": "lcms_class",
+          "value": "Trees",
+          "status": "ok",
+          "source": "USFS_LCMS",
+          "source_url": "https://data.fs.usda.gov/geodata/rastergateway/LCMS/",
+          "confidence": "medium",
+          "fetched_at": "2026-07-12T20:46:11.972321+00:00",
+          "dataset_vintage": "USFS LCMS Land_Cover CONUS v2025-11 (2025 annual), ~120 m block-mode CONUS COG",
+          "point": {
+            "lat": 34.0712787850862,
+            "lng": -118.78701707546617
           }
         },
         {
@@ -1585,39 +1604,39 @@
           "source": "USFS_NLCD_TCC",
           "source_url": "https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:55.145656+00:00",
+          "fetched_at": "2026-07-12T20:46:11.972993+00:00",
           "dataset_vintage": "USFS/MRLC NLCD Tree Canopy Cover 2025 (v2025-6), CONUS COG (~120 m block-mean canopy %)",
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.7873257760918
+            "lat": 34.0712787850862,
+            "lng": -118.78701707546617
           }
         },
         {
           "field": "ndvi_current",
-          "value": 0.6235124468803406,
+          "value": 0.639229416847229,
           "status": "ok",
           "source": "COPERNICUS_S2_SR_HARMONIZED",
           "source_url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED",
           "confidence": "high",
-          "fetched_at": "2026-07-12T18:36:56.536280+00:00",
+          "fetched_at": "2026-07-12T20:46:13.163884+00:00",
           "dataset_vintage": "S2 SR 60d window @ 2026-07-12",
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.7873257760918
+            "lat": 34.0712787850862,
+            "lng": -118.78701707546617
           }
         },
         {
           "field": "slope_degrees",
-          "value": 32.13185119628906,
+          "value": 23.562341690063477,
           "status": "ok",
           "source": "USGS_3DEP_COG",
           "source_url": "https://www.usgs.gov/3d-elevation-program",
           "confidence": "medium",
-          "fetched_at": "2026-07-12T18:36:55.174883+00:00",
+          "fetched_at": "2026-07-12T20:46:12.117639+00:00",
           "dataset_vintage": null,
           "point": {
-            "lat": 34.07070766759285,
-            "lng": -118.7873257760918
+            "lat": 34.0712787850862,
+            "lng": -118.78701707546617
           }
         }
       ]
@@ -1627,7 +1646,7 @@
     "zone_priority_directions": [
       {
         "direction": "SW",
-        "directional_threat": 1.1474,
+        "directional_threat": 1.4589,
         "zones": {
           "Zone 0": {
             "range": "0-5 ft from structures, decks, and attachments",
@@ -1660,7 +1679,7 @@
       },
       {
         "direction": "W",
-        "directional_threat": 1.0875,
+        "directional_threat": 1.0998,
         "zones": {
           "Zone 0": {
             "range": "0-5 ft from structures, decks, and attachments",
@@ -1740,6 +1759,6 @@
     "No hydrant, road-egress, evacuation, fuel-moisture, roof, vent, or structure-material fields are available from Mireye.",
     "Structure-hardening advice is prescriptive CAL FIRE guidance, not observed building evidence.",
     "ndvi_current is a point-in-time snapshot; treat dryness readings as indicative, not a continuous monitor.",
-    "Ring origin used: geocoded_point_fixed_radius_fallback \u2014 parcel geometry was unavailable, so the ring radiates from the geocoded point instead of a parcel centroid."
+    "Ring origin used: parcel_centroid."
   ]
 }

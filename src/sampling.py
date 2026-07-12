@@ -1,9 +1,10 @@
 """Ring generation and Mireye sampling: centroid + 8 bearings x 3 radii.
 
-Parcel-aware: if the geocoded point's parcel_boundary_geojson resolves, the
-ring radiates from the parcel's (vertex-average) centroid instead of the
-raw geocoded point. If parcel geometry is null (expected on Regrid's free
-tier per the README), falls back to a fixed radius from the geocoded point.
+Parcel-aware: if the geocoded point's parcel_boundary_geojson resolves
+(Polygon or MultiPolygon), the ring radiates from the parcel's centroid
+instead of the raw geocoded point. If parcel geometry is null (expected on
+Regrid's free tier per the README) or unparseable, falls back to a fixed
+radius from the geocoded point.
 """
 
 import json
@@ -31,34 +32,115 @@ def destination_point(lat_deg, lng_deg, bearing_deg, distance_m):
     return math.degrees(lat2), math.degrees(lng2)
 
 
-def parcel_centroid_from_geojson(geojson_str):
-    """Vertex-average centroid of a parcel Polygon's exterior ring.
+def _strip_closing_vertex(ring):
+    return ring[:-1] if len(ring) > 1 and ring[0] == ring[-1] else ring
 
-    Not an area-weighted centroid (would need a geometry library for that);
-    for the small, roughly-convex residential parcels this targets, the
-    vertex average is a reasonable approximation of the parcel center.
-    Returns (lat, lng) or None if the geometry can't be parsed.
+
+def _vertex_average(coords):
+    if not coords:
+        return None
+    avg_lng = sum(pt[0] for pt in coords) / len(coords)
+    avg_lat = sum(pt[1] for pt in coords) / len(coords)
+    return avg_lat, avg_lng
+
+
+def _polygon_area_and_centroid(exterior_coords):
+    """Signed area and centroid of a simple polygon's exterior ring via the
+    shoelace formula. exterior_coords are (lng, lat) pairs with no closing
+    duplicate. Returns (signed_area, (lat, lng)) or (0.0, None) if degenerate
+    (fewer than 3 vertices, or zero area)."""
+    n = len(exterior_coords)
+    if n < 3:
+        return 0.0, None
+
+    area = 0.0
+    cx = 0.0
+    cy = 0.0
+    for i in range(n):
+        x0, y0 = exterior_coords[i]
+        x1, y1 = exterior_coords[(i + 1) % n]
+        cross = x0 * y1 - x1 * y0
+        area += cross
+        cx += (x0 + x1) * cross
+        cy += (y0 + y1) * cross
+    area *= 0.5
+    if area == 0:
+        return 0.0, None
+
+    cx /= 6 * area
+    cy /= 6 * area
+    return area, (cy, cx)  # (lat, lng)
+
+
+def parcel_centroid_from_geojson(geojson_str):
+    """Centroid of a parcel's Polygon or MultiPolygon geometry.
+
+    Polygon: vertex-average of the exterior ring. Not an area-weighted
+    centroid (would need a geometry library for full correctness); for the
+    small, roughly-convex residential parcels this targets, the vertex
+    average is a reasonable approximation of the parcel center.
+
+    MultiPolygon: area-weighted centroid across parts, computed via the
+    shoelace formula on each part's exterior ring, weighted by |area| and
+    combined. Chosen over "centroid of the largest part" because Regrid
+    MultiPolygon parcels seen in practice (e.g. Latigo Canyon, Malibu) have
+    a dominant part plus small slivers (easements, right-of-way clips) —
+    area-weighting lets the dominant part drive the result while still
+    accounting for the others, rather than discarding them outright. Falls
+    back to a simple vertex-average across all parts' vertices if every
+    part is degenerate (zero area).
+
+    Returns (lat, lng) or None if the geometry can't be parsed/is empty —
+    the caller falls back to the geocoded point in that case.
     """
     try:
         geom = json.loads(geojson_str)
     except (TypeError, ValueError):
         return None
 
-    if geom.get("type") != "Polygon":
-        return None
-    rings = geom.get("coordinates")
-    if not rings or not rings[0]:
-        return None
+    geom_type = geom.get("type")
 
-    exterior = rings[0]
-    # GeoJSON polygons repeat the first vertex as the last; drop the dup.
-    coords = exterior[:-1] if len(exterior) > 1 and exterior[0] == exterior[-1] else exterior
-    if not coords:
-        return None
+    if geom_type == "Polygon":
+        rings = geom.get("coordinates")
+        if not rings or not rings[0]:
+            return None
+        coords = _strip_closing_vertex(rings[0])
+        return _vertex_average(coords)
 
-    avg_lng = sum(pt[0] for pt in coords) / len(coords)
-    avg_lat = sum(pt[1] for pt in coords) / len(coords)
-    return avg_lat, avg_lng
+    if geom_type == "MultiPolygon":
+        parts = geom.get("coordinates")
+        if not parts:
+            return None
+
+        weighted_lat = 0.0
+        weighted_lng = 0.0
+        total_weight = 0.0
+        all_vertices = []
+
+        for part in parts:
+            if not part or not part[0]:
+                continue
+            exterior = _strip_closing_vertex(part[0])
+            if not exterior:
+                continue
+            all_vertices.extend(exterior)
+
+            area, centroid = _polygon_area_and_centroid(exterior)
+            if centroid is None:
+                continue
+            weight = abs(area)
+            weighted_lat += centroid[0] * weight
+            weighted_lng += centroid[1] * weight
+            total_weight += weight
+
+        if total_weight > 0:
+            return weighted_lat / total_weight, weighted_lng / total_weight
+
+        # Every part was degenerate (zero area) — fall back to a plain
+        # vertex-average across all parts rather than giving up entirely.
+        return _vertex_average(all_vertices)
+
+    return None
 
 
 def generate_ring_points(origin_lat, origin_lng):

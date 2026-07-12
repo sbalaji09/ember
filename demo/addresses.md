@@ -1,10 +1,11 @@
 # Demo Addresses
 
-Captured **2026-07-12T1940Z**. Ember's output is not deterministic across
-runs (NDVI moves under a rolling 60-day window — see LIMITATIONS.md), so
-these are timestamped snapshots, not fixed reference values. Each address
-has a `.json` (`./ember --json`) and a `.md` (`./ember`, rendered prose)
-captured from the same run.
+Captured **2026-07-12T1940Z**, except Latigo Canyon (re-captured
+**2026-07-12T2047Z** after a `sampling.py` bug fix — see below). Ember's
+output is not deterministic across runs (NDVI moves under a rolling 60-day
+window — see LIMITATIONS.md), so these are timestamped snapshots, not fixed
+reference values. Each address has a `.json` (`./ember --json`) and a `.md`
+(`./ember`, rendered prose) captured from the same run.
 
 ## Coffey Park, Santa Rosa
 
@@ -23,12 +24,23 @@ captured from the same run.
 - **Address:** 3000 Latigo Canyon Rd, Malibu, CA → matched `3000 LATIGO
   CANYON RD, MALIBU, CA, 90265` (34.0675, -118.7835) — steep Santa Monica
   Mountains chaparral/oak canyon.
-- **Band:** Moderate (composite 0.3209)
+- **Band:** Moderate (composite 0.3728)
 - **fuel_history_caveat:** not triggered
 - **partial_failures:** 0
 - **Demonstrates:** steep chaparral — proves the directional uphill-slope
   threat model (worst bearings SW/W, slope multiplier well above baseline).
-- Files: `latigo_canyon_2026-07-12T1940Z.json`, `latigo_canyon_2026-07-12T1940Z.md`
+- **Re-captured 2026-07-12T2047Z** after fixing a real bug in
+  `sampling.py`: `parcel_centroid_from_geojson()` only handled `Polygon`
+  geometry, so this address's `MultiPolygon` parcel silently fell back to
+  the geocoded point for ring sampling instead of the true parcel centroid
+  — caught when the frontend's map drew the real parcel outline (Leaflet
+  handles `MultiPolygon` natively) and it visibly disagreed with the
+  backend's ring origin marker. After the fix, `ring_origin.source` is
+  `parcel_centroid` (was `geocoded_point_fixed_radius_fallback`); band held
+  at **Moderate** (0.3209 → 0.3728) and dominant directions held at **SW,
+  W** (SW: 1.147 → 1.459; W: 1.088 → 1.100) — same story, more accurate
+  numbers. Full details in LIMITATIONS.md.
+- Files: `latigo_canyon_2026-07-12T2047Z.json`, `latigo_canyon_2026-07-12T2047Z.md`
 
 ## Paradise, Butte County
 

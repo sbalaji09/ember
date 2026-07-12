@@ -401,6 +401,38 @@ confirming `scoring.py`'s own `gaps` (distinct from Mireye-level
 `partial_failures` — a null/failed field status, not a request-level
 failure) also survive into `report_data` unfiltered.
 
+## Frontend build: MultiPolygon gap in sampling.py, and a Leaflet API mistake
+
+Building `frontend/` (Leaflet map + FastAPI backend at `src/server.py`)
+surfaced two things:
+
+**Real gap found in existing code, not fixed here:**
+`sampling.py`'s `parcel_centroid_from_geojson()` only handles GeoJSON
+`Polygon` geometry — it returns `None` (triggering the fixed-radius
+fallback) for `MultiPolygon`, even when valid geometry is present. This was
+invisible until the frontend actually rendered a parcel outline: at Latigo
+Canyon, Malibu, `parcel_boundary_geojson` is a genuine `MultiPolygon` with
+`status: "ok"`, so the map correctly draws the real parcel shape (Leaflet's
+`L.geoJSON()` handles `MultiPolygon` natively) — but the backend's own ring
+origin fell back to the geocoded point instead of a true parcel centroid,
+because the Python parser silently treats "not a Polygon" the same as "no
+geometry at all." The frontend's `header.ring_origin.source` correctly
+reported `"geocoded_point_fixed_radius_fallback"` for this address, so
+nothing was mis-reported — but the *reason* for the fallback wasn't "no
+geometry" as the fallback language implies, it was "geometry present but
+unhandled shape." Worth fixing in `sampling.py` directly (extend the vertex
+averaging to iterate all polygons in a MultiPolygon) in a future pass; not
+done as part of the frontend work since it's a pre-existing pipeline
+behavior, not something the frontend introduced.
+
+**Debugging note:** the map briefly failed to auto-fit its view around the
+drawn arrows/parcel with `mapLayerGroup.getBounds is not a function` —
+`L.layerGroup()` doesn't implement `getBounds()`, only `L.featureGroup()`
+does. Caught immediately by the app's own error-state handling (the UI
+correctly showed the error message rather than hanging silently), which is
+also incidental confirmation that the frontend's try/catch discipline works
+as intended, not just its happy path.
+
 ## Environment / tooling
 
 - Local Python 3.13 (`/Library/Frameworks/Python.framework`) has a broken

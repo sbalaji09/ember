@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ember — Wildfire Hardening Advisor</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">Ember</span>
+    <span class="tagline">Per-home wildfire hardening advisor</span>
+  </div>
+  <form id="assess-form" class="search-form">
+    <input id="address-input" type="text" placeholder="123 Main St, Santa Rosa, CA" autocomplete="off" required />
+    <button type="submit" id="assess-btn">Assess</button>
+  </form>
+</header>
+
+<main id="app">
+
+  <div id="empty-state" class="state-panel">
+    <p>Enter a California address above to generate a site-specific wildfire hardening report, grounded in federal fuel, terrain, and fire-weather data.</p>
+  </div>
+
+  <div id="loading-state" class="state-panel hidden">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Sampling terrain and fuel around the parcel…</p>
+  </div>
+
+  <div id="error-state" class="state-panel error hidden"></div>
+
+  <div id="results" class="results hidden">
+
+    <div class="map-column">
+      <div id="map"></div>
+      <div id="map-north" class="map-overlay map-north" aria-hidden="true">N&nbsp;&#9650;</div>
+      <div id="map-legend" class="map-overlay map-legend"></div>
+    </div>
+
+    <div class="panel-column">
+      <nav class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="data" role="tab" aria-selected="true">Data &amp; Sources</button>
+        <button class="tab-btn" data-tab="report" role="tab" aria-selected="false">Written Report</button>
+      </nav>
+
+      <section id="tab-data" class="tab-panel" role="tabpanel"></section>
+      <section id="tab-report" class="tab-panel hidden" role="tabpanel"></section>
+    </div>
+
+  </div>
+
+</main>
+
+<footer class="footer">
+  Ember reads federal fuel, terrain, and fire-weather data from Mireye. Landscape-scale directional guidance, not per-zone geometry — see &ldquo;What this cannot see&rdquo; below each report.
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

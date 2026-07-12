@@ -65,6 +65,7 @@ the full document is not.
 def _bearing_summary(bearing_result):
     return {
         "label": bearing_result["label"],
+        "bearing_deg": bearing_result["bearing_deg"],
         "fuel_score": round(bearing_result["fuel_score"], 4),
         "avg_slope_degrees": bearing_result["avg_slope_degrees"],
         "slope_multiplier": round(bearing_result["slope_multiplier"], 3),
@@ -86,6 +87,7 @@ def build_report_data(address_input, geocode_result, sample, scored):
         "ring_origin": sample["origin"],
         "parcel_address": scoring.citation("parcel_address", centroid_envelope),
         "parcel_area_m2": scoring.citation("parcel_area_m2", centroid_envelope),
+        "parcel_boundary_geojson": scoring.citation("parcel_boundary_geojson", centroid_envelope),
         "tract_geoid": scoring.citation("tract_geoid", centroid_envelope),
     }
 

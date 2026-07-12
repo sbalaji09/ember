@@ -223,11 +223,14 @@ ember/
     scoring.py           # deterministic threat model
     report.py            # Claude-written prose from scored/cited data
     cli.py               # ember "123 Main St, Santa Rosa, CA"
-    app.py               # optional minimal web UI with parcel + threat-arrow map
+    server.py             # FastAPI backend for the frontend: POST /assess, serves frontend/
+    app.py                # unimplemented stub -- superseded by server.py + frontend/
     mcp_server.py        # optional assess_wildfire_risk(address) MCP tool
+  frontend/
+    index.html, style.css, app.js  # map + data-viz UI -- see frontend/README.md to run it
   tests/
   demo/
-    addresses.md         # the three demo homes + captured outputs
+    addresses.md         # the four demo homes + captured outputs
 ```
 
 ## Environment

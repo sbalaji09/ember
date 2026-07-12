@@ -242,38 +242,15 @@ function renderLegend() {
 
 // --- data panel rendering ---
 
-// Hover/focus definitions for the Data & Sources tab. Every term wrapped
-// with term() below pulls its text from here — never invented inline, so
-// the definitions stay in one auditable place.
-// Trimmed deliberately to terms that are actually non-obvious in context —
-// driver names, the composite score, and CAL FIRE zone numbers. Things like
-// "Low/Moderate" band names or "confidence: high" read fine on their own;
-// tooltipping every word on the page just adds visual noise.
+// Hover/focus definitions for the Data & Sources tab. Keep this intentionally
+// small: only composite or domain-specific concepts get a tooltip.
 const GLOSSARY = {
   composite: "The single weighted number (0–1) combining all six drivers below into the overall exposure band. Not a probability — a relative severity score.",
   wildfire_annual_frequency: "How often wildfires are estimated to occur in this property's census tract per year, from FEMA's National Risk Index. A tract-level average, not specific to this parcel.",
   max_directional_threat: "The highest directional threat value (fuel score × slope amplification) among the 8 compass bearings sampled around the property.",
-  housing_units_density_per_km2: "Housing units per square kilometer nearby, from Census data — a proxy for structure-to-structure ignition risk in dense neighborhoods.",
-  drought_category_ordinal: "Current U.S. Drought Monitor category, from 'not in drought' up to D4 (exceptional drought). Drier conditions raise fire risk.",
-  days_above_32c_annual_count: "Average number of days per year the temperature exceeds 32°C (90°F) here, from NOAA climate normals.",
-  design_wind_speed_mph: "The engineering design wind speed for this location (ASCE 7 standard) — used as a proxy for wind-driven fire spread.",
   zone_0: "0–5 ft from the structure — the 'ember-resistant zone,' highest priority for hardening.",
   zone_1: "5–30 ft from the structure — reduce and space out vegetation here.",
   zone_2: "30–100 ft from the structure — thin fuel to slow an approaching fire.",
-};
-
-const SOURCE_GLOSSARY = {
-  FEMA_NRI: "FEMA's National Risk Index — federal natural-hazard data aggregated by census tract.",
-  REGRID: "Regrid — third-party parcel boundary and property data provider.",
-  CENSUS_GEOCODING: "U.S. Census Bureau geocoding service — resolves an address to coordinates and census geography (e.g. tract).",
-  CENSUS_TIGERWEB: "U.S. Census Bureau TIGERweb — housing unit counts from the decennial census.",
-  USDM_CURRENT: "U.S. Drought Monitor — weekly drought severity classification (NOAA / USDA / NDMC).",
-  NOAA_NCEI_NCLIMGRID_DAILY: "NOAA's gridded daily climate data — used here for extreme-heat day counts.",
-  NOAA_ASCE_WIND_VECTORS: "ASCE 7 structural design wind speed maps, distributed via NOAA.",
-  USGS_3DEP_COG: "USGS 3D Elevation Program — terrain elevation, slope, and aspect.",
-  USFS_LCMS: "US Forest Service Land Change Monitoring System — land cover classification (~120m resolution).",
-  USFS_NLCD_TCC: "USFS/NLCD Tree Canopy Cover — percent tree canopy (~120m resolution).",
-  COPERNICUS_S2_SR_HARMONIZED: "Copernicus Sentinel-2 satellite imagery — used here for NDVI vegetation greenness/dryness (~10m resolution).",
 };
 
 function term(displayHtml, definition) {
@@ -340,6 +317,7 @@ function renderBandCard(blob) {
     days_above_32c_annual_count: "Days above 32&deg;C / year",
     design_wind_speed_mph: "Design wind speed",
   };
+  const driverTooltipKeys = new Set(["wildfire_annual_frequency", "max_directional_threat"]);
 
   const driverRows = Object.entries(o.drivers)
     .map(([key, d]) => {
@@ -347,10 +325,11 @@ function renderBandCard(blob) {
       const raw = d.raw === null ? "no data" : typeof d.raw === "number" ? fmt(d.raw, 4) : d.raw;
       const source = d.citation && d.citation.status === "ok" ? d.citation.source : null;
       const sourceHtml = source ? ` &middot; ${source}` : "";
+      const label = driverLabels[key] || key;
       return `
         <div class="driver-row">
           <div class="driver-row-top">
-            <span class="driver-name">${term(driverLabels[key] || key, GLOSSARY[key])}</span>
+            <span class="driver-name">${driverTooltipKeys.has(key) ? term(label, GLOSSARY[key]) : label}</span>
             <span class="driver-weight">weight ${(d.weight * 100).toFixed(0)}%</span>
           </div>
           <div class="driver-bar-track"><div class="driver-bar-fill" style="width:${pct}%"></div></div>
@@ -480,7 +459,7 @@ function renderSourcesCard(blob) {
         fetchedAts.length > 1 ? `${fetchedAts.length} timestamps (multiple sample points)` : fetchedAts[0] || "—";
       return `
         <tr>
-          <td>${term(s.source, SOURCE_GLOSSARY[s.source])}</td>
+          <td>${s.source}</td>
           <td>${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener">link</a>` : "—"}</td>
           <td>${confidences}</td>
           <td>${fetchedDisplay}</td>

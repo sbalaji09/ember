@@ -275,3 +275,99 @@ def test_score_property_identifies_worst_direction():
     assert result["overall"]["band"] in {"Low", "Moderate", "High", "Very High"}
     # every bearing present
     assert set(result["bearings"].keys()) == set(config.BEARING_LABELS.values())
+
+
+# --- fuel_history_caveat: additive disclosure, must never touch the band/composite ---
+
+
+def _paradise_like_centroid_kwargs(wildfire_annual_frequency=0.0014):
+    # Mirrors the real 6626 Skyway, Paradise, CA read: barren/low-canopy fuel,
+    # non-zero but modest tract wildfire frequency.
+    return dict(
+        wildfire_annual_frequency=wildfire_annual_frequency,
+        aspect_degrees=200.0,
+        housing_units_density_per_km2=50.0,
+        design_wind_speed_mph=100.0,
+        drought_category=None,
+        days_above_32c_annual_count=75,
+    )
+
+
+def _uniform_low_fuel_ring():
+    ring = []
+    for bearing in config.BEARINGS_DEG:
+        for radius in config.RING_RADII_M:
+            ring.append(
+                make_ring_point(
+                    bearing, radius,
+                    lcms_class="Barren or Impervious", tree_canopy_pct=4.0,
+                    ndvi_current=0.3, slope_degrees=8.0,
+                )
+            )
+    return ring
+
+
+def test_fuel_history_caveat_paradise_like_scenario_triggers():
+    sample = {
+        "geocoded": {"lat": 39.76, "lng": -121.62},
+        "origin": {"lat": 39.76, "lng": -121.62, "source": "geocoded_point_fixed_radius_fallback", "parcel_aware": False},
+        "centroid_envelope": make_envelope(**_paradise_like_centroid_kwargs()),
+        "ring": _uniform_low_fuel_ring(),
+    }
+    result = scoring.score_property(sample)
+    caveat = result["fuel_history_caveat"]
+    assert caveat["triggered"] is True
+    assert caveat["reason"] == scoring.FUEL_HISTORY_CAVEAT_REASON
+
+
+def test_fuel_history_caveat_flat_zero_frequency_control_does_not_trigger():
+    # Santa Rosa (flat, urban) control: wildfire_annual_frequency reads a
+    # true 0.0 even though current fuel is also low — must NOT fire, since
+    # there's no recorded fire history to explain a low reading against.
+    sample = {
+        "geocoded": {"lat": 38.44, "lng": -122.71},
+        "origin": {"lat": 38.44, "lng": -122.71, "source": "geocoded_point_fixed_radius_fallback", "parcel_aware": False},
+        "centroid_envelope": make_envelope(**_paradise_like_centroid_kwargs(wildfire_annual_frequency=0.0)),
+        "ring": _uniform_low_fuel_ring(),
+    }
+    result = scoring.score_property(sample)
+    caveat = result["fuel_history_caveat"]
+    assert caveat["triggered"] is False
+    assert caveat["reason"] is None
+
+
+def test_fuel_history_caveat_does_not_trigger_when_fuel_is_not_low():
+    # Same wildfire frequency as the Paradise-like case, but healthy forested
+    # fuel (like Latigo Canyon) — must NOT fire.
+    ring = []
+    for bearing in config.BEARINGS_DEG:
+        for radius in config.RING_RADII_M:
+            ring.append(
+                make_ring_point(
+                    bearing, radius,
+                    lcms_class="Trees", tree_canopy_pct=35.0,
+                    ndvi_current=0.65, slope_degrees=25.0,
+                )
+            )
+    sample = {
+        "geocoded": {"lat": 34.07, "lng": -118.78},
+        "origin": {"lat": 34.07, "lng": -118.78, "source": "parcel_centroid", "parcel_aware": True},
+        "centroid_envelope": make_envelope(**_paradise_like_centroid_kwargs(wildfire_annual_frequency=0.0127)),
+        "ring": ring,
+    }
+    result = scoring.score_property(sample)
+    assert result["fuel_history_caveat"]["triggered"] is False
+
+
+def test_fuel_history_caveat_is_additive_band_and_composite_unchanged():
+    """Golden-value regression: the exact overall band/composite for the
+    existing _synthetic_sample() fixture, captured BEFORE the caveat feature
+    was added, must be byte-for-byte identical after adding it. Proves the
+    caveat computation is pure disclosure with zero effect on scoring."""
+    result = scoring.score_property(_synthetic_sample())
+    overall = result["overall"]
+    assert overall["band"] == "High"
+    assert overall["composite"] == 0.488939393939394
+    # the caveat key exists and is independently computed, but touches nothing above
+    assert "fuel_history_caveat" in result
+    assert isinstance(result["fuel_history_caveat"]["triggered"], bool)

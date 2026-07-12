@@ -36,8 +36,14 @@ are ~120m rasters, wildfire_annual_frequency is census-tract level. Do not claim
 individual 5/30/100 ft zone contents from them — only landscape/directional findings mapped onto \
 the standard zone checklist.
 - Output clean Markdown with exactly these sections, in this order: \
-Header, Overall Exposure, Terrain and Approach, Directional Fuel Findings, \
+Header, Overall Exposure, Interpretation Caveat (only if fuel_history_caveat.triggered is true — \
+omit this section entirely if it is false), Terrain and Approach, Directional Fuel Findings, \
 Prioritized Action Plan, Sources, What This Cannot See.
+- The Interpretation Caveat section, when present, is a note about DATA INTERPRETATION, not a \
+risk-level adjustment. It never changes or reinterprets the exposure band computed in Overall \
+Exposure. Render the exact text of fuel_history_caveat.reason verbatim — do not paraphrase, \
+soften, strengthen, or add to it. Do not use it to imply the exposure band is wrong or should be \
+read differently than stated.
 - In Sources, list every distinct (source, source_url) pair actually used, each with its \
 confidence level(s) and fetched_at timestamp(s) as given.
 - Do not add sections, disclaimers, or content beyond what the data supports.
@@ -135,6 +141,7 @@ def build_report_data(address_input, geocode_result, sample, scored):
     return {
         "header": header,
         "overall": scored["overall"],
+        "fuel_history_caveat": scored["fuel_history_caveat"],
         "terrain": terrain,
         "bearings": bearings,
         "action_plan": action_plan,

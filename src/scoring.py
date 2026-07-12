@@ -221,6 +221,42 @@ def score_overall_exposure(centroid_envelope, max_directional_threat):
     return {"composite": composite, "band": band, "drivers": drivers, "gaps": gaps}
 
 
+FUEL_HISTORY_CAVEAT_REASON = (
+    "This area has a recorded wildfire history in the tract-level data, but the current "
+    "fuel reading directly around the property is low. A low current fuel reading may "
+    "reflect prior burn, clearing, or development rather than durable safety."
+)
+
+
+def check_fuel_history_caveat(centroid_envelope, mean_fuel_score):
+    """Disclosure only — never feeds into score_overall_exposure and never
+    changes the band or composite. Fires when the tract has a measurably
+    non-zero recorded wildfire frequency (WILDFIRE_HISTORY_PRESENT_THRESHOLD)
+    and the property's current fuel reading is low
+    (LOW_CURRENT_FUEL_MEAN_SCORE_THRESHOLD). See config.py for the empirical
+    grounding of both thresholds."""
+    wf_citation = citation("wildfire_annual_frequency", centroid_envelope)
+    wf_value = wf_citation["value"] if wf_citation["status"] == "ok" else None
+
+    triggered = (
+        wf_value is not None
+        and wf_value >= config.WILDFIRE_HISTORY_PRESENT_THRESHOLD
+        and mean_fuel_score is not None
+        and mean_fuel_score <= config.LOW_CURRENT_FUEL_MEAN_SCORE_THRESHOLD
+    )
+
+    return {
+        "triggered": triggered,
+        "reason": FUEL_HISTORY_CAVEAT_REASON if triggered else None,
+        "wildfire_annual_frequency_citation": wf_citation,
+        "mean_fuel_score": mean_fuel_score,
+        "thresholds": {
+            "wildfire_history_present": config.WILDFIRE_HISTORY_PRESENT_THRESHOLD,
+            "low_current_fuel_mean_score": config.LOW_CURRENT_FUEL_MEAN_SCORE_THRESHOLD,
+        },
+    }
+
+
 def score_property(sample):
     """sample: output of sampling.sample_property(). Returns the full
     deterministic scoring result: per-bearing threat vectors, top threat
@@ -255,6 +291,11 @@ def score_property(sample):
     if aspect_degrees is None:
         all_gaps.append({"field": "aspect_degrees", "point": None, "bearing": None, "radius_m": None})
 
+    mean_fuel_score = (
+        sum(b["fuel_score"] for b in bearings.values()) / len(bearings) if bearings else None
+    )
+    fuel_history_caveat = check_fuel_history_caveat(centroid_envelope, mean_fuel_score)
+
     return {
         "aspect_degrees": aspect_degrees,
         "aspect_citation": citation("aspect_degrees", centroid_envelope),
@@ -262,6 +303,7 @@ def score_property(sample):
         "bearings": bearings,
         "top_threats": top_threats,
         "overall": overall,
+        "fuel_history_caveat": fuel_history_caveat,
         "gaps": all_gaps,
         "ndvi_change_5y_citation": citation("ndvi_change_5y", centroid_envelope),
     }

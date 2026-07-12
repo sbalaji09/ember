@@ -216,6 +216,95 @@ if the weighting is revisited later.
   still being phased in as of this build; verify current status against
   CAL FIRE for the specific jurisdiction before treating it as settled.
 
+## Fuel/history interpretation caveat (`fuel_history_caveat`)
+
+Follow-up to the calibration investigation above. After the
+`max_directional_threat` tuning fix, Paradise still scores `Low`. Its ring
+data genuinely reads barren/low-canopy at multiple bearings — consistent
+with post-Camp-Fire clearing and rebuild along Skyway. Rather than silently
+accept or silently boost that `Low`, Ember now surfaces a **non-band-affecting
+disclosure** when a property's current fuel reads low in a tract that still
+has *some* recorded wildfire frequency: `Low` may reflect a recent burn or
+clearing, not durable safety.
+
+**Important honesty correction versus how this was originally framed.**
+The original hypothesis (see the calibration section above) was "high
+historical frequency + low current fuel." That framing doesn't survive
+contact with the actual data: Paradise's own `wildfire_annual_frequency`
+(0.0014) is **not elevated** — it's the second-lowest of the 7 addresses in
+the survey, roughly 33x lower than Julian's (0.046). FEMA NRI's tract-level
+annualized frequency does not appear to reflect Paradise's well-documented
+catastrophic 2018 history (plausible causes: it measures event frequency,
+not severity of a single catastrophic event; tract boundaries or the
+underlying table may have been affected by the same disaster; the metric is
+national and may not weight singular megafires the way local intuition
+would). This is itself a real, separate data limitation worth stating
+plainly, not something to paper over by mislabeling the trigger condition.
+
+Because of this, the flag's trigger is **"a measurably non-zero recorded
+frequency," not "elevated/significant" frequency** — it distinguishes tracts
+with any recorded wildfire history at all from tracts reading a true 0.0
+(pure urban core). The caveat text reflects this honestly ("a recorded
+history," never "a significant/elevated history").
+
+**Thresholds (`config.py`), empirically grounded against the same 7-address
+survey used for the `max_directional_threat` fix:**
+
+| Location | wildfire_annual_frequency | mean fuel_score (8 bearings) | Must fire? |
+|---|---|---|---|
+| Santa Rosa (flat, urban) | ~0.00001 | 0.065 | **must NOT** |
+| Paradise (post-Camp-Fire) | 0.0014 | 0.148 | **must** |
+| Big Bear Lake | 0.0136 | 0.150 | (not required, but legitimate) |
+| Latigo Canyon, Malibu | 0.0127 | 0.288 | must NOT |
+| Julian (Cedar Fire town) | 0.0460 | 0.206 | must NOT |
+| Alpine | 0.0224 | 0.258 | must NOT |
+| Forest Falls | 0.0314 | 0.339 | must NOT |
+
+- `WILDFIRE_HISTORY_PRESENT_THRESHOLD = 0.001` — sits just above Santa
+  Rosa's near-zero reading and at/below Paradise's 0.0014, so it separates
+  "any recorded frequency" from "no recorded frequency," not "high" from
+  "low."
+- `LOW_CURRENT_FUEL_MEAN_SCORE_THRESHOLD = 0.16` — sits between the
+  {Paradise, Big Bear} cluster (~0.148-0.150) and the next-lowest real
+  sample, Julian, at 0.206.
+
+**Actual firing results, run through the real pipeline (`./ember --json`),
+not hand-calculated:**
+
+| Location | Triggered? |
+|---|---|
+| Paradise | **TRIGGERED** ✓ (required) |
+| Big Bear Lake | TRIGGERED (fuel legitimately reads just as low as Paradise's — same resolution-mismatch story, not a fluke) |
+| Latigo Canyon | not triggered (fuel isn't low) |
+| Forest Falls | not triggered |
+| Julian | not triggered |
+| Alpine | not triggered |
+| Santa Rosa (flat) | **not triggered** ✓ (required) |
+
+**Non-band-affecting by design.** `check_fuel_history_caveat()` in
+`scoring.py` takes the centroid envelope and the mean per-bearing fuel score
+as inputs and is never called by, or passed into, `score_overall_exposure()`
+— there is no code path by which its output can influence `composite` or
+`band`. Verified two ways:
+1. A golden-value regression test
+   (`test_fuel_history_caveat_is_additive_band_and_composite_unchanged`)
+   locks the exact `composite` (`0.488939393939394`) and `band` (`"High"`)
+   for the existing synthetic fixture, captured before this feature existed,
+   and asserts they're still exactly equal after adding it.
+2. Re-ran all 7 real addresses before and after: every band is identical.
+   (Composite values drifted by a few hundredths between the two runs —
+   e.g. Paradise 0.1809 -> 0.1516 — but that's live NDVI data changing
+   under a rolling 60-day Sentinel-2 window between the two `./ember`
+   invocations, not the code change; `max_directional_threat` and the other
+   drivers were untouched by this feature and the band never moved.)
+
+`fuel_history_caveat` is emitted as its own top-level key in the `--json`
+output (`triggered`, `reason`, `wildfire_annual_frequency_citation`,
+`mean_fuel_score`, `thresholds`) and, when `triggered` is true, rendered in
+`report.py` as its own "Interpretation Caveat" section — the system prompt
+requires Claude to render `reason` verbatim and forbids using it to imply
+the exposure band should be read differently than stated.
+
 ## Environment / tooling
 
 - Local Python 3.13 (`/Library/Frameworks/Python.framework`) has a broken

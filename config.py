@@ -138,3 +138,38 @@ DROUGHT_CATEGORY_ORDINAL = {None: 0, "D0": 0, "D1": 1, "D2": 2, "D3": 3, "D4": 4
 
 # Top N worst approach directions to surface in the report.
 TOP_THREAT_DIRECTIONS = 2
+
+# --- Fuel/history interpretation caveat ---
+# A disclosure that rides ALONGSIDE the computed exposure band; it never
+# feeds into score_overall_exposure and never changes the band or composite.
+# Fires when the tract has a measurably non-zero recorded wildfire frequency
+# but the property's current fuel reading is low — a signal that a "Low"
+# band may reflect a prior burn/clearing rather than durable safety, not
+# that this property is elevated risk (the band already says what the band
+# says; this is a note about *why* the inputs read the way they do).
+#
+# Grounded against the 7-address survey used to calibrate
+# max_directional_threat above (wildfire_annual_frequency raw / mean
+# fuel_score across the 8 bearings):
+#   Santa Rosa (flat, urban)  freq=0.0000  fuel=0.065  -> must NOT fire
+#   Paradise (post-Camp-Fire) freq=0.0014  fuel=0.148  -> must fire
+#   Big Bear Lake             freq=0.0136  fuel=0.150  -> fires (legitimately: also reads low)
+#   Latigo Canyon, Malibu     freq=0.0127  fuel=0.288  -> must NOT fire (fuel isn't low)
+#   Alpine                    freq=0.0224  fuel=0.258  -> must NOT fire
+#   Julian (Cedar Fire town)  freq=0.0460  fuel=0.206  -> must NOT fire
+#   Forest Falls              freq=0.0314  fuel=0.339  -> must NOT fire
+#
+# Important honesty note (see LIMITATIONS.md): Paradise's own
+# wildfire_annual_frequency (0.0014) is NOT elevated in this data — it is
+# the second-lowest of the 7 addresses surveyed, well below Latigo Canyon,
+# Alpine, Julian, and Forest Falls. FEMA NRI's tract-level annualized
+# frequency does not appear to reflect Paradise's well-documented
+# catastrophic 2018 history. WILDFIRE_HISTORY_PRESENT_THRESHOLD is
+# therefore deliberately a "distinguishably non-zero" bar, not an
+# "elevated" one — it separates tracts with ANY recorded wildfire
+# frequency from tracts reading a true 0.0 (pure urban core, e.g. downtown
+# Santa Rosa), not "high-history" tracts from "low-history" ones. The
+# caveat text reflects this honestly: "a recorded history," not "a
+# significant/elevated history."
+WILDFIRE_HISTORY_PRESENT_THRESHOLD = 0.001  # just above Santa Rosa's 0.0, at/below Paradise's 0.0014
+LOW_CURRENT_FUEL_MEAN_SCORE_THRESHOLD = 0.16  # between {Paradise, Big Bear} ~0.15 and the next-lowest real sample (Julian) at 0.206

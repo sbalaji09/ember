@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# ember "123 Main St, Santa Rosa, CA"
+set -euo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$DIR/.env" ]; then
+  set -a
+  source "$DIR/.env"
+  set +a
+fi
+exec python3 "$DIR/src/cli.py" "$@"

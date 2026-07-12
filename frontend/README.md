@@ -34,21 +34,26 @@ graceful-degradation path, not an error state.
 
 ## Architecture
 
-- `src/server.py` — FastAPI app. One endpoint, `POST /assess {address}`,
-  that runs the *existing* pipeline unchanged: `geocode` → `sample_property`
-  → `score_property` → `build_report_data` → (if a key is present)
+- `src/server.py` — FastAPI app. `GET /address-suggestions?q=...` returns
+  ranked California street-address suggestions from OSM-backed providers
+  (Photon first, Nominatim fallback), and `POST /assess {address}` runs the
+  *existing* pipeline unchanged: `geocode` → `sample_property` →
+  `score_property` → `build_report_data` → (if a key is present)
   `render_report`. Returns `{scored_blob, prose, prose_available,
   prose_error}`, where `scored_blob` is exactly what `./ember --json`
   produces. No scoring or fetching logic is reimplemented here — this file
   is wiring, not a second pipeline. Also serves `frontend/` as static files
   via `StaticFiles`, so the API and the UI are one process.
 - `frontend/index.html`, `style.css`, `app.js` — vanilla JS (ES module), no
-  bundler, no framework. Talks to `/assess` on the same origin. The only
-  math it does locally is plotting geometry (great-circle destination
-  points, mirroring `sampling.py`'s formula, so directional-threat arrows
-  land at the right pixel) — every risk *value* (arrow length, arrow color,
-  band, driver contributions) is read directly from `scored_blob`, never
-  computed in the browser.
+  bundler, no framework. Talks to `/address-suggestions` and `/assess` on
+  the same origin. Address autocomplete is debounced, aborts superseded
+  requests, caches recent queries client-side, supports loading/no-match
+  states, and can be navigated with keyboard arrows + Enter. The only math it
+  does locally is plotting geometry (great-circle destination points,
+  mirroring `sampling.py`'s formula, so directional-threat arrows land at the
+  right pixel) — every risk *value* (arrow length, arrow color, band, driver
+  contributions) is read directly from `scored_blob`, never computed in the
+  browser.
 - Map: [Leaflet](https://leafletjs.com/) loaded from a CDN, two keyless base
   layers (Esri World Imagery satellite, default; OpenStreetMap standard).
   No API key required for either.

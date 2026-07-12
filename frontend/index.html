@@ -16,8 +16,8 @@
   </div>
   <form id="assess-form" class="search-form">
     <div class="search-input-wrap">
-      <input id="address-input" type="text" placeholder="123 Main St, Santa Rosa, CA" autocomplete="off" required />
-      <ul id="address-suggestions" class="suggestions-list hidden" role="listbox"></ul>
+      <input id="address-input" name="address" type="text" placeholder="123 Main St, Santa Rosa, CA" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="search" required role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" />
+      <ul id="address-suggestions" class="suggestions-list hidden" role="listbox" aria-live="polite"></ul>
     </div>
     <button type="submit" id="assess-btn">Assess</button>
   </form>

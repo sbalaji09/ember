@@ -516,13 +516,53 @@ contract:
    `clearTimeout()` the pending debounce and `abort()` any in-flight
    request.
 4. **Glossary tooltips.** Added a `GLOSSARY`/`SOURCE_GLOSSARY` dictionary
-   and a `term()` helper in `app.js` that wraps driver names, source names,
-   confidence levels, zone labels, and key scoring terms (fuel score, slope
-   multiplier, directional threat, ring origin, etc.) in a dotted-underline
-   span with a hover/focus tooltip. Definitions are plain restatements of
+   and a `term()` helper in `app.js`. Definitions are plain restatements of
    what the pipeline already computes — no new claims, nothing that could
    drift from what `scoring.py`/`report.py` actually do. Keyboard-accessible
    via `tabindex="0"` + `:focus`, not hover-only.
+
+## Follow-up: tooltip scope trimmed, real autocomplete bug fixed
+
+After using the build, feedback was that tooltips were applied too broadly
+(dotted underlines on nearly every label added visual noise rather than
+helping) and that address autocomplete "doesn't show up."
+
+**Tooltips trimmed** to four genuinely non-obvious spots: the six Overall
+Exposure driver names, "composite score," the three CAL FIRE zone numbers
+(Zone 0/1/2), and source names in the Sources table (the one place a reader
+is actually browsing unfamiliar acronyms). Removed from: the map legend, the
+band badge, header ring-origin/parcel-centroid labels, inline citation tags
+scattered through the caveat/failures/driver rows, confidence-level tags,
+and the repeated "directional threat" mentions in zone-priority headers.
+`GLOSSARY` shrank from 21 entries to 10; unused entries (`band`,
+`confidence_*`, `ring_origin`, `parcel_centroid`, `uphill`, `fuel_score`,
+`slope_multiplier`, standalone `directional_threat`) were deleted rather
+than left dead in the dictionary.
+
+**Autocomplete: found and fixed a real bug, not an environment issue.**
+Investigated by reproducing the reported symptom directly rather than
+guessing. The dropdown itself worked (confirmed via automated typing +
+screenshot). The actual failure was one step later: `selectSuggestion()`
+filled the address input with Nominatim's full `display_name` — e.g.
+`"3000, Latigo Canyon Road, Malibu Vista, Unincorporated Santa Monica
+Mountains, Los Angeles County, California, 90265, United States"` — and
+submitted that directly to `/assess`. The Census Geocoder rejects any
+address over 100 characters (`HTTP 400: "Address cannot be empty and
+cannot exceed 100 characters"`), and this real address hit that limit
+exactly, so every suggestion selection for it failed. From the user's
+perspective this looked like "autocomplete doesn't show up," because the
+error state replaced the results before they'd registered the dropdown had
+worked at all.
+
+Fixed by requesting `addressdetails=1` from Nominatim and building a short
+`"123 Main St, City, State ZIP"` string from the structured address fields
+(`formatConciseAddress()`) instead of using `display_name` for the actual
+submission — `display_name` is still shown in the dropdown list itself,
+where its extra detail helps disambiguate similar addresses. Also added
+`console.warn()` calls on autocomplete fetch failure/non-200, since a
+silently-swallowed network error (ad blocker, offline, corporate proxy)
+would otherwise be indistinguishable from "no suggestions for this query"
+with zero trace for anyone debugging via devtools.
 
 ## Environment / tooling
 

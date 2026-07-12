@@ -89,10 +89,11 @@ html, body {
 
 #address-input {
   width: 100%;
-  padding: 9px 12px;
+  padding: 9px 56px 9px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font-size: 14px;
+  line-height: 1.35;
   color: var(--text);
   background: var(--bg);
 }
@@ -104,27 +105,68 @@ html, body {
 
 .suggestions-list {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
   z-index: 60;
   margin: 0;
-  padding: 4px;
+  padding: 6px;
   list-style: none;
   background: var(--panel-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  max-height: 260px;
+  box-shadow: 0 10px 24px rgba(30, 26, 14, 0.11), 0 2px 6px rgba(30, 26, 14, 0.08);
+  max-height: 236px;
   overflow-y: auto;
 }
 
 .suggestion-item {
-  padding: 8px 10px;
+  padding: 9px 10px;
   border-radius: 6px;
   font-size: 13px;
+  line-height: 1.25;
   cursor: pointer;
   color: var(--text);
+}
+
+.suggestion-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.25;
+  cursor: default;
+}
+
+.suggestion-spinner {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.suggestion-main,
+.suggestion-secondary {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestion-main {
+  font-weight: 550;
+}
+
+.suggestion-secondary {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .suggestion-item:hover,

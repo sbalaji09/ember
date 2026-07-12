@@ -19,10 +19,11 @@ for path in (_REPO_ROOT, _SRC_DIR):
     if path not in sys.path:
         sys.path.insert(0, path)
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from address_suggestions import AddressSuggestionError, suggest_addresses
 from geocode import geocode, GeocodeError
 from mireye_client import MireyeClient, MireyeConfigError, MireyeRequestError
 from sampling import sample_property
@@ -36,6 +37,19 @@ FRONTEND_DIR = os.path.join(_REPO_ROOT, "frontend")
 
 class AssessRequest(BaseModel):
     address: str
+
+
+@app.get("/address-suggestions")
+def address_suggestions(q: str = "", limit: int = Query(6, ge=1, le=10)):
+    query = q.strip()
+    if not query:
+        return {"suggestions": []}
+
+    try:
+        suggestions = suggest_addresses(query, limit=limit)
+    except AddressSuggestionError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return {"suggestions": suggestions}
 
 
 @app.post("/assess")

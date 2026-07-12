@@ -87,3 +87,35 @@ def test_assess_geocode_failure_returns_422(client, monkeypatch):
 def test_assess_empty_address_returns_400(client):
     resp = client.post("/assess", json={"address": "   "})
     assert resp.status_code == 400
+
+
+def test_address_suggestions_returns_backend_suggestions(client, monkeypatch):
+    monkeypatch.setattr(
+        server,
+        "suggest_addresses",
+        lambda query, limit=6: [
+            {
+                "address": "123 Main St, Santa Rosa, CA 95401",
+                "display": "123 Main St, Santa Rosa, CA 95401",
+                "secondary": "Sonoma County",
+                "lat": 38.44,
+                "lng": -122.71,
+                "importance": 0.4,
+                "rank": 1,
+                "source": "OpenStreetMap Nominatim",
+            }
+        ],
+    )
+
+    resp = client.get("/address-suggestions", params={"q": "123 main", "limit": 3})
+    assert resp.status_code == 200
+
+    body = resp.json()
+    assert body["suggestions"][0]["address"] == "123 Main St, Santa Rosa, CA 95401"
+    assert body["suggestions"][0]["rank"] == 1
+
+
+def test_address_suggestions_empty_query_returns_empty_list(client):
+    resp = client.get("/address-suggestions", params={"q": "   "})
+    assert resp.status_code == 200
+    assert resp.json() == {"suggestions": []}

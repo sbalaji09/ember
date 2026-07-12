@@ -232,17 +232,11 @@ function renderMap(blob) {
 
 function renderLegend() {
   els.legend.innerHTML = `
-    <h4>${term("Directional threat", GLOSSARY.directional_threat)}</h4>
+    <h4>Directional threat</h4>
     <div class="legend-gradient"></div>
     <div class="legend-labels"><span>lower</span><span>higher</span></div>
-    <div class="legend-note">Arrow length and color both scale with each bearing's directional threat value (${term(
-      "fuel score",
-      GLOSSARY.fuel_score
-    )} &times; ${term("slope multiplier", GLOSSARY.slope_multiplier)}). Longest/reddest = worst approach direction. Not the same scale as the overall exposure band below.</div>
-    <div class="legend-uphill"><span class="legend-swatch-line"></span> ${term(
-      "Uphill",
-      GLOSSARY.uphill
-    )} (fire climbs toward house)</div>
+    <div class="legend-note">Arrow length and color both scale with each bearing's directional threat value (fuel score &times; slope multiplier). Longest/reddest = worst approach direction. Not the same scale as the overall exposure band below.</div>
+    <div class="legend-uphill"><span class="legend-swatch-line"></span> Uphill (fire climbs toward house)</div>
   `;
 }
 
@@ -251,28 +245,21 @@ function renderLegend() {
 // Hover/focus definitions for the Data & Sources tab. Every term wrapped
 // with term() below pulls its text from here — never invented inline, so
 // the definitions stay in one auditable place.
+// Trimmed deliberately to terms that are actually non-obvious in context —
+// driver names, the composite score, and CAL FIRE zone numbers. Things like
+// "Low/Moderate" band names or "confidence: high" read fine on their own;
+// tooltipping every word on the page just adds visual noise.
 const GLOSSARY = {
   composite: "The single weighted number (0–1) combining all six drivers below into the overall exposure band. Not a probability — a relative severity score.",
-  band: "Low / Moderate / High / Very High — a category derived from the composite score. A bucket, not a prediction of fire occurrence.",
   wildfire_annual_frequency: "How often wildfires are estimated to occur in this property's census tract per year, from FEMA's National Risk Index. A tract-level average, not specific to this parcel.",
-  max_directional_threat: "The highest directional threat value among the 8 compass bearings sampled around the property.",
+  max_directional_threat: "The highest directional threat value (fuel score × slope amplification) among the 8 compass bearings sampled around the property.",
   housing_units_density_per_km2: "Housing units per square kilometer nearby, from Census data — a proxy for structure-to-structure ignition risk in dense neighborhoods.",
   drought_category_ordinal: "Current U.S. Drought Monitor category, from 'not in drought' up to D4 (exceptional drought). Drier conditions raise fire risk.",
   days_above_32c_annual_count: "Average number of days per year the temperature exceeds 32°C (90°F) here, from NOAA climate normals.",
   design_wind_speed_mph: "The engineering design wind speed for this location (ASCE 7 standard) — used as a proxy for wind-driven fire spread.",
-  fuel_score: "How much burnable vegetation is present in a direction, combining land-cover type, tree canopy percent, and vegetation dryness (NDVI).",
-  slope_multiplier: "How much steep upslope terrain amplifies fire spread toward the house in this direction. 1.0 = no amplification.",
-  directional_threat: "fuel score × slope multiplier for one compass direction — ranks which side of the property is most exposed.",
-  uphill: "The direction opposite the slope's downhill face. Fire below the house on the downhill side spreads upslope toward it.",
-  ring_origin: "The center point Ember samples outward from: the parcel's own center when boundary data is available, otherwise the geocoded address point.",
-  parcel_centroid: "The geometric center of the actual parcel boundary, computed from Regrid's parcel outline data.",
   zone_0: "0–5 ft from the structure — the 'ember-resistant zone,' highest priority for hardening.",
   zone_1: "5–30 ft from the structure — reduce and space out vegetation here.",
   zone_2: "30–100 ft from the structure — thin fuel to slow an approaching fire.",
-  confidence_high: "High confidence: a direct, current reading from the primary source with no interpolation or fallback involved.",
-  confidence_medium: "Medium confidence: a reading with some caveat — an older snapshot, a derived/interpolated value, or a coarser-resolution source.",
-  confidence_low: "Low confidence: a degraded or indirect reading — treat as a rough indicator, not a precise value.",
-  confidence_unknown: "The source did not report a confidence level for this value.",
 };
 
 const SOURCE_GLOSSARY = {
@@ -307,7 +294,7 @@ function fmtFull(n) {
 
 function citationSourceTag(citation) {
   if (!citation || citation.status !== "ok" || !citation.source) return "";
-  return `<span class="src-tag">${term(citation.source, SOURCE_GLOSSARY[citation.source])}</span>`;
+  return `<span class="src-tag">${citation.source}</span>`;
 }
 
 function renderHeaderCard(blob) {
@@ -318,16 +305,13 @@ function renderHeaderCard(blob) {
       : null;
   const tract = h.tract_geoid && h.tract_geoid.status === "ok" ? h.tract_geoid.value : null;
   const ringOriginLabel = h.ring_origin.parcel_aware
-    ? term("parcel centroid", GLOSSARY.parcel_centroid)
+    ? "parcel centroid"
     : "geocoded point (fixed-radius fallback)";
 
   return `
     <div class="card header-card">
       <div class="addr">${h.matched_address}</div>
-      <div class="coords">${h.geocoded_lat.toFixed(5)}, ${h.geocoded_lng.toFixed(5)} &middot; ${term(
-    "ring origin",
-    GLOSSARY.ring_origin
-  )}: ${ringOriginLabel}</div>
+      <div class="coords">${h.geocoded_lat.toFixed(5)}, ${h.geocoded_lng.toFixed(5)} &middot; ring origin: ${ringOriginLabel}</div>
       ${
         parcelSize
           ? `<div class="header-fact-row"><span class="header-fact-label">Parcel size</span><span class="header-fact-value">${parcelSize}${citationSourceTag(
@@ -362,7 +346,7 @@ function renderBandCard(blob) {
       const pct = d.normalized === null ? 0 : Math.round(d.normalized * 100);
       const raw = d.raw === null ? "no data" : typeof d.raw === "number" ? fmt(d.raw, 4) : d.raw;
       const source = d.citation && d.citation.status === "ok" ? d.citation.source : null;
-      const sourceHtml = source ? ` &middot; ${term(source, SOURCE_GLOSSARY[source])}` : "";
+      const sourceHtml = source ? ` &middot; ${source}` : "";
       return `
         <div class="driver-row">
           <div class="driver-row-top">
@@ -379,7 +363,7 @@ function renderBandCard(blob) {
   return `
     <div class="card">
       <h3>Overall exposure</h3>
-      <span class="band-badge ${bandClass(o.band)}">${term(o.band, GLOSSARY.band)}</span>
+      <span class="band-badge ${bandClass(o.band)}">${o.band}</span>
       <div class="band-composite">${term("composite score", GLOSSARY.composite)} ${fmt(o.composite, 4)} &mdash; every driver below is shown, not a black box</div>
       ${driverRows}
     </div>
@@ -394,7 +378,7 @@ function renderCaveatCard(blob) {
     <div class="caveat-card">
       <h3>Interpretation caveat</h3>
       <p>${c.reason}</p>
-      <div class="caveat-inline">${term("Wildfire annual frequency", GLOSSARY.wildfire_annual_frequency)}: ${fmtFull(cite.value)} (source: ${term(cite.source, SOURCE_GLOSSARY[cite.source])})</div>
+      <div class="caveat-inline">Wildfire annual frequency: ${fmtFull(cite.value)} (source: ${cite.source})</div>
       <div class="caveat-disclaimer">This is a note on how to interpret the data above — it does not change the exposure band shown above.</div>
     </div>
   `;
@@ -409,7 +393,7 @@ function renderFailuresCard(blob) {
     .map(
       (f) => `
       <div class="fail-item">
-        <span class="fail-field">${f.field}</span> from ${f.source ? term(f.source, SOURCE_GLOSSARY[f.source]) : "unknown source"} &mdash;
+        <span class="fail-field">${f.field}</span> from ${f.source || "unknown source"} &mdash;
         <span class="fail-error">${f.error}</span>
         ${f.lat && f.lng ? `<div class="gap-note">at ${f.lat.toFixed(4)}, ${f.lng.toFixed(4)}${f.retryable ? " (retryable)" : ""}</div>` : ""}
       </div>`
@@ -441,7 +425,7 @@ function renderZonesCard(blob) {
         .join("");
       return `
         <div class="zone-priority">
-          <h4>Priority: ${p.direction} &mdash; ${term("directional threat", GLOSSARY.directional_threat)} ${fmt(p.directional_threat, 3)}</h4>
+          <h4>Priority: ${p.direction} &mdash; directional threat ${fmt(p.directional_threat, 3)}</h4>
           ${zoneBlocks}
         </div>
       `;
@@ -489,7 +473,7 @@ function renderSourcesCard(blob) {
   const rows = collectCitations(blob)
     .map((s) => {
       const confidences = Array.from(s.confidences)
-        .map((c) => `<span class="confidence-tag">${term(c, GLOSSARY["confidence_" + c])}</span>`)
+        .map((c) => `<span class="confidence-tag">${c}</span>`)
         .join(" ");
       const fetchedAts = Array.from(s.fetchedAts);
       const fetchedDisplay =
@@ -509,7 +493,7 @@ function renderSourcesCard(blob) {
     <div class="card">
       <h3>Sources (browse the provenance)</h3>
       <table class="sources-table">
-        <thead><tr><th>Source</th><th>URL</th><th>${term("Confidence", "How reliable this specific reading is, as reported by the underlying data source.")}</th><th>Fetched at</th></tr></thead>
+        <thead><tr><th>Source</th><th>URL</th><th>Confidence</th><th>Fetched at</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -661,23 +645,55 @@ els.exportPdfBtn.addEventListener("click", () => {
 });
 
 // --- address autocomplete ---
-// Uses OpenStreetMap's Nominatim search API for suggestions as the user
-// types — free, keyless, same pattern as the OSM map tile layer already in
-// use. Only ever sends the partial address text being typed; no secrets
-// involved. The final geocode (what actually determines lat/lng for
-// scoring) still goes through the Census Geocoder on the backend — this is
-// suggestions only, not a second source of truth.
-const AUTOCOMPLETE_MIN_CHARS = 4;
-const AUTOCOMPLETE_DEBOUNCE_MS = 350;
-const CALIFORNIA_VIEWBOX = "-124.5,42.1,-114.0,32.4"; // left,top,right,bottom
+// Uses the backend /address-suggestions endpoint so address lookup stays
+// same-origin. The backend filters ranked OSM-backed provider results down
+// to California street-address candidates. The final geocode for scoring still
+// goes through the Census Geocoder in /assess.
+const AUTOCOMPLETE_MIN_CHARS = 3;
+const AUTOCOMPLETE_DEBOUNCE_MS = 180;
+const AUTOCOMPLETE_CACHE_LIMIT = 40;
 
 let autocompleteTimer = null;
 let autocompleteAbortController = null;
 let currentSuggestions = [];
 let highlightedIndex = -1;
+let activeSuggestionQuery = "";
+const suggestionCache = new Map();
 
 function escapeHtmlLite(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function isAutocompleteQueryReady(query) {
+  const trimmed = query.trim();
+  if (trimmed.length < AUTOCOMPLETE_MIN_CHARS) return false;
+
+  const leadingHouseNumber = trimmed.match(/^\d+[A-Za-z]?\b/);
+  if (!leadingHouseNumber) return true;
+  return trimmed.length >= AUTOCOMPLETE_MIN_CHARS;
+}
+
+function autocompleteCacheKey(query) {
+  return query.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function getCachedSuggestions(query) {
+  const key = autocompleteCacheKey(query);
+  if (!suggestionCache.has(key)) return null;
+  const value = suggestionCache.get(key);
+  suggestionCache.delete(key);
+  suggestionCache.set(key, value);
+  return value;
+}
+
+function cacheSuggestions(query, suggestions) {
+  const key = autocompleteCacheKey(query);
+  if (!key) return;
+  if (suggestionCache.has(key)) suggestionCache.delete(key);
+  suggestionCache.set(key, suggestions);
+  while (suggestionCache.size > AUTOCOMPLETE_CACHE_LIMIT) {
+    suggestionCache.delete(suggestionCache.keys().next().value);
+  }
 }
 
 async function fetchAddressSuggestions(query) {
@@ -685,24 +701,26 @@ async function fetchAddressSuggestions(query) {
   autocompleteAbortController = new AbortController();
 
   const params = new URLSearchParams({
-    format: "json",
-    addressdetails: "0",
-    limit: "6",
-    countrycodes: "us",
-    viewbox: CALIFORNIA_VIEWBOX,
-    bounded: "1",
     q: query,
+    limit: "10",
   });
 
   try {
-    const resp = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+    const resp = await fetch(`/address-suggestions?${params}`, {
       signal: autocompleteAbortController.signal,
       headers: { Accept: "application/json" },
     });
-    if (!resp.ok) return [];
-    return await resp.json();
+    if (!resp.ok) {
+      console.warn(`Address autocomplete: server returned HTTP ${resp.status}`);
+      return [];
+    }
+    const body = await resp.json();
+    return body.suggestions || [];
   } catch (err) {
     if (err.name === "AbortError") return null; // superseded by a newer keystroke
+    // Fail silently in the UI (no dropdown) but leave a trace for anyone
+    // debugging via devtools, since this is otherwise invisible.
+    console.warn("Address autocomplete: suggestion fetch failed —", err);
     return [];
   }
 }
@@ -714,48 +732,94 @@ function hideSuggestions() {
   clearTimeout(autocompleteTimer);
   if (autocompleteAbortController) autocompleteAbortController.abort();
   els.suggestions.classList.add("hidden");
+  els.input.setAttribute("aria-expanded", "false");
+  els.input.removeAttribute("aria-activedescendant");
+  els.suggestions.removeAttribute("aria-busy");
   els.suggestions.innerHTML = "";
   currentSuggestions = [];
   highlightedIndex = -1;
+  activeSuggestionQuery = "";
 }
 
 function updateHighlight() {
   Array.from(els.suggestions.children).forEach((el, i) => {
-    el.classList.toggle("highlighted", i === highlightedIndex);
+    const active = i === highlightedIndex;
+    el.classList.toggle("highlighted", active);
+    el.setAttribute("aria-selected", active ? "true" : "false");
+    if (active) {
+      els.input.setAttribute("aria-activedescendant", el.id);
+      el.scrollIntoView({ block: "nearest" });
+    }
   });
+  if (highlightedIndex < 0) els.input.removeAttribute("aria-activedescendant");
+}
+
+function renderSuggestionState(kind, message) {
+  currentSuggestions = [];
+  highlightedIndex = -1;
+  els.suggestions.innerHTML = `
+    <li class="suggestion-status suggestion-status-${kind}" role="option" aria-disabled="true">
+      ${kind === "loading" ? '<span class="suggestion-spinner" aria-hidden="true"></span>' : ""}
+      <span>${escapeHtmlLite(message)}</span>
+    </li>
+  `;
+  els.suggestions.classList.remove("hidden");
+  els.input.setAttribute("aria-expanded", "true");
+  els.input.removeAttribute("aria-activedescendant");
+  els.suggestions.setAttribute("aria-busy", kind === "loading" ? "true" : "false");
 }
 
 function renderSuggestions(items) {
   currentSuggestions = items || [];
   highlightedIndex = -1;
   if (!currentSuggestions.length) {
-    hideSuggestions();
+    renderSuggestionState("empty", "No matching addresses");
     return;
   }
   els.suggestions.innerHTML = currentSuggestions
-    .map((item, i) => `<li class="suggestion-item" data-idx="${i}" role="option">${escapeHtmlLite(item.display_name)}</li>`)
+    .map(
+      (item, i) => `
+        <li id="address-suggestion-${i}" class="suggestion-item" data-idx="${i}" role="option" aria-selected="false">
+          <span class="suggestion-main">${escapeHtmlLite(item.display || item.address)}</span>
+          ${item.secondary ? `<span class="suggestion-secondary">${escapeHtmlLite(item.secondary)}</span>` : ""}
+        </li>
+      `
+    )
     .join("");
   els.suggestions.classList.remove("hidden");
+  els.input.setAttribute("aria-expanded", "true");
+  els.suggestions.setAttribute("aria-busy", "false");
 }
 
 function selectSuggestion(idx) {
   const item = currentSuggestions[idx];
   if (!item) return;
-  els.input.value = item.display_name;
+  const address = item.address || item.display;
+  els.input.value = address;
   hideSuggestions();
-  runAssessment(item.display_name);
+  els.input.focus();
 }
 
 els.input.addEventListener("input", () => {
   const query = els.input.value.trim();
   clearTimeout(autocompleteTimer);
-  if (query.length < AUTOCOMPLETE_MIN_CHARS) {
+  activeSuggestionQuery = query;
+  if (!isAutocompleteQueryReady(query)) {
     hideSuggestions();
     return;
   }
+  const cached = getCachedSuggestions(query);
+  if (cached) {
+    renderSuggestions(cached);
+  } else {
+    renderSuggestionState("loading", "Searching addresses");
+  }
   autocompleteTimer = setTimeout(async () => {
+    const queryAtRequest = query;
     const items = await fetchAddressSuggestions(query);
     if (items === null) return; // aborted — a newer request is already in flight
+    if (autocompleteCacheKey(activeSuggestionQuery) !== autocompleteCacheKey(queryAtRequest)) return;
+    cacheSuggestions(queryAtRequest, items);
     renderSuggestions(items);
   }, AUTOCOMPLETE_DEBOUNCE_MS);
 });
@@ -786,6 +850,15 @@ els.suggestions.addEventListener("click", (e) => {
   const li = e.target.closest(".suggestion-item");
   if (!li) return;
   selectSuggestion(Number(li.dataset.idx));
+});
+
+els.suggestions.addEventListener("pointermove", (e) => {
+  const li = e.target.closest(".suggestion-item");
+  if (!li) return;
+  const idx = Number(li.dataset.idx);
+  if (idx === highlightedIndex) return;
+  highlightedIndex = idx;
+  updateHighlight();
 });
 
 document.addEventListener("click", (e) => {

@@ -475,6 +475,55 @@ correctly showed the error message rather than hanging silently), which is
 also incidental confirmation that the frontend's try/catch discipline works
 as intended, not just its happy path.
 
+## Frontend UX pass: arrow visibility, PDF export, address autocomplete, glossary tooltips
+
+Four usability fixes to `frontend/`, none touching scoring or the API
+contract:
+
+1. **Threat arrow visibility.** The original green-to-red gradient
+   (`colorForNormalizedThreat()`) disappeared against satellite
+   imagery — green arrows over trees/grass were nearly invisible, which is
+   the exact terrain the map exists to show. Switched to a blue-to-red
+   gradient (no green stop at all, since green has a natural analog in
+   aerial photos and blue doesn't) and added a white halo/outline under
+   every arrow line and around every arrowhead, so the arrow reads against
+   any background — dark forest, pale dirt, pavement. Verified via a
+   before/after screenshot at Latigo Canyon (dense chaparral/oak canopy):
+   the dominant SW arrow is now sharply visible in orange-red against the
+   trees, where it previously blended in.
+2. **PDF export.** Added an "Export as PDF" button on the Written Report
+   tab that calls the browser's native `window.print()` — no PDF library
+   dependency. `style.css` adds `@media print` rules that hide everything
+   except the report prose (topbar, map, tabs, the export button itself).
+   Verified via Playwright's print-media emulation: header/map/tabs/toolbar
+   all compute to `display: none` and `#tab-report` to `display: block`
+   under print media, and a screenshot of the print-emulated page shows a
+   clean, appropriately-formatted document.
+3. **Address autocomplete.** Debounced (350ms) typeahead against OpenStreetMap's
+   Nominatim search API, restricted to a California viewbox — free, keyless,
+   same trust pattern already established for the OSM/Esri map tiles.
+   Suggestions only; the actual geocode that drives scoring still goes
+   through the Census Geocoder on the backend unchanged. **Bug found and
+   fixed during verification:** the debounce timer and in-flight fetch
+   weren't cancelled on form submission, so a slow autocomplete response
+   could resolve *after* the user had already submitted the form and pop
+   the suggestions dropdown back open over the loading/results view — caught
+   because a screenshot script's simulated "type then immediately click
+   Assess" sequence reproduced it reliably (a human typing at normal
+   speed would rarely trigger the exact race, which is exactly why
+   automated interaction testing caught it and manual spot-checking
+   likely wouldn't have). Fixed by having `hideSuggestions()` also
+   `clearTimeout()` the pending debounce and `abort()` any in-flight
+   request.
+4. **Glossary tooltips.** Added a `GLOSSARY`/`SOURCE_GLOSSARY` dictionary
+   and a `term()` helper in `app.js` that wraps driver names, source names,
+   confidence levels, zone labels, and key scoring terms (fuel score, slope
+   multiplier, directional threat, ring origin, etc.) in a dotted-underline
+   span with a hover/focus tooltip. Definitions are plain restatements of
+   what the pipeline already computes — no new claims, nothing that could
+   drift from what `scoring.py`/`report.py` actually do. Keyboard-accessible
+   via `tabindex="0"` + `:focus`, not hover-only.
+
 ## Environment / tooling
 
 - Local Python 3.13 (`/Library/Frameworks/Python.framework`) has a broken

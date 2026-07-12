@@ -22,6 +22,7 @@ const BAND_COLORS = {
 const els = {
   form: document.getElementById("assess-form"),
   input: document.getElementById("address-input"),
+  suggestions: document.getElementById("address-suggestions"),
   btn: document.getElementById("assess-btn"),
   empty: document.getElementById("empty-state"),
   loading: document.getElementById("loading-state"),
@@ -29,6 +30,8 @@ const els = {
   results: document.getElementById("results"),
   tabData: document.getElementById("tab-data"),
   tabReport: document.getElementById("tab-report"),
+  reportContent: document.getElementById("report-content"),
+  exportPdfBtn: document.getElementById("export-pdf-btn"),
   legend: document.getElementById("map-legend"),
 };
 
@@ -83,13 +86,17 @@ function clamp01(x) {
   return Math.max(0, Math.min(1, x));
 }
 
-// Interpolates green -> amber -> orange -> red across normalized [0,1].
+// Interpolates blue -> gold -> orange -> red across normalized [0,1].
+// Deliberately NOT green-based: green arrows disappeared against satellite
+// imagery's trees/grass (the exact terrain this map exists to show). Blue
+// has no natural analog in aerial photos, so even the "low" end of the
+// scale stays visible. Keep in sync with --threat-* variables in style.css.
 function colorForNormalizedThreat(t) {
   const stops = [
-    [0.0, [91, 130, 102]], // sage green
-    [0.4, [185, 144, 44]], // amber
-    [0.7, [193, 98, 45]], // burnt orange
-    [1.0, [156, 59, 46]], // deep red
+    [0.0, [47, 111, 176]], // blue
+    [0.4, [212, 175, 55]], // gold
+    [0.7, [214, 106, 33]], // orange
+    [1.0, [176, 42, 30]], // red
   ];
   for (let i = 0; i < stops.length - 1; i++) {
     const [t0, c0] = stops[i];
@@ -163,20 +170,34 @@ function renderMap(blob) {
     const isWorst = worstLabels.has(b.label);
 
     const tip = destinationPoint(origin.lat, origin.lng, b.bearing_deg, lenM);
+    const lineWeight = isWorst ? 5 : 3;
+
+    // White halo underneath so the arrow reads against ANY satellite
+    // background (dark forest, pale dirt, pavement) — the colored line
+    // alone was getting lost against similarly-toned terrain.
+    L.polyline([originLatLng, tip], {
+      color: "#ffffff",
+      weight: lineWeight + 4,
+      opacity: 0.85,
+    }).addTo(mapLayerGroup);
 
     L.polyline([originLatLng, tip], {
       color,
-      weight: isWorst ? 5 : 3,
-      opacity: isWorst ? 0.95 : 0.75,
+      weight: lineWeight,
+      opacity: isWorst ? 1 : 0.9,
     }).addTo(mapLayerGroup);
 
-    // small arrowhead: short perpendicular-ish line pair at the tip
+    // arrowhead: filled triangle at the tip, with a white outline for the
+    // same contrast reason as the halo above.
     const headBack = destinationPoint(tip[0], tip[1], (b.bearing_deg + 180) % 360, 22);
     const left = destinationPoint(headBack[0], headBack[1], (b.bearing_deg + 90) % 360, 12);
     const right = destinationPoint(headBack[0], headBack[1], (b.bearing_deg - 90 + 360) % 360, 12);
-    L.polygon([tip, left, right], { color, fillColor: color, fillOpacity: 0.9, weight: 0 }).addTo(
-      mapLayerGroup
-    );
+    L.polygon([tip, left, right], {
+      color: "#ffffff",
+      weight: 2,
+      fillColor: color,
+      fillOpacity: 1,
+    }).addTo(mapLayerGroup);
 
     L.circleMarker(originLatLng, { radius: 0, opacity: 0 }); // no-op keeps origin referenced
 
@@ -211,15 +232,67 @@ function renderMap(blob) {
 
 function renderLegend() {
   els.legend.innerHTML = `
-    <h4>Directional threat</h4>
+    <h4>${term("Directional threat", GLOSSARY.directional_threat)}</h4>
     <div class="legend-gradient"></div>
     <div class="legend-labels"><span>lower</span><span>higher</span></div>
-    <div class="legend-note">Arrow length and color both scale with each bearing's directional threat value (fuel &times; slope). Longest/reddest = worst approach direction. Not the same scale as the overall exposure band below.</div>
-    <div class="legend-uphill"><span class="legend-swatch-line"></span> Uphill (fire climbs toward house)</div>
+    <div class="legend-note">Arrow length and color both scale with each bearing's directional threat value (${term(
+      "fuel score",
+      GLOSSARY.fuel_score
+    )} &times; ${term("slope multiplier", GLOSSARY.slope_multiplier)}). Longest/reddest = worst approach direction. Not the same scale as the overall exposure band below.</div>
+    <div class="legend-uphill"><span class="legend-swatch-line"></span> ${term(
+      "Uphill",
+      GLOSSARY.uphill
+    )} (fire climbs toward house)</div>
   `;
 }
 
 // --- data panel rendering ---
+
+// Hover/focus definitions for the Data & Sources tab. Every term wrapped
+// with term() below pulls its text from here — never invented inline, so
+// the definitions stay in one auditable place.
+const GLOSSARY = {
+  composite: "The single weighted number (0–1) combining all six drivers below into the overall exposure band. Not a probability — a relative severity score.",
+  band: "Low / Moderate / High / Very High — a category derived from the composite score. A bucket, not a prediction of fire occurrence.",
+  wildfire_annual_frequency: "How often wildfires are estimated to occur in this property's census tract per year, from FEMA's National Risk Index. A tract-level average, not specific to this parcel.",
+  max_directional_threat: "The highest directional threat value among the 8 compass bearings sampled around the property.",
+  housing_units_density_per_km2: "Housing units per square kilometer nearby, from Census data — a proxy for structure-to-structure ignition risk in dense neighborhoods.",
+  drought_category_ordinal: "Current U.S. Drought Monitor category, from 'not in drought' up to D4 (exceptional drought). Drier conditions raise fire risk.",
+  days_above_32c_annual_count: "Average number of days per year the temperature exceeds 32°C (90°F) here, from NOAA climate normals.",
+  design_wind_speed_mph: "The engineering design wind speed for this location (ASCE 7 standard) — used as a proxy for wind-driven fire spread.",
+  fuel_score: "How much burnable vegetation is present in a direction, combining land-cover type, tree canopy percent, and vegetation dryness (NDVI).",
+  slope_multiplier: "How much steep upslope terrain amplifies fire spread toward the house in this direction. 1.0 = no amplification.",
+  directional_threat: "fuel score × slope multiplier for one compass direction — ranks which side of the property is most exposed.",
+  uphill: "The direction opposite the slope's downhill face. Fire below the house on the downhill side spreads upslope toward it.",
+  ring_origin: "The center point Ember samples outward from: the parcel's own center when boundary data is available, otherwise the geocoded address point.",
+  parcel_centroid: "The geometric center of the actual parcel boundary, computed from Regrid's parcel outline data.",
+  zone_0: "0–5 ft from the structure — the 'ember-resistant zone,' highest priority for hardening.",
+  zone_1: "5–30 ft from the structure — reduce and space out vegetation here.",
+  zone_2: "30–100 ft from the structure — thin fuel to slow an approaching fire.",
+  confidence_high: "High confidence: a direct, current reading from the primary source with no interpolation or fallback involved.",
+  confidence_medium: "Medium confidence: a reading with some caveat — an older snapshot, a derived/interpolated value, or a coarser-resolution source.",
+  confidence_low: "Low confidence: a degraded or indirect reading — treat as a rough indicator, not a precise value.",
+  confidence_unknown: "The source did not report a confidence level for this value.",
+};
+
+const SOURCE_GLOSSARY = {
+  FEMA_NRI: "FEMA's National Risk Index — federal natural-hazard data aggregated by census tract.",
+  REGRID: "Regrid — third-party parcel boundary and property data provider.",
+  CENSUS_GEOCODING: "U.S. Census Bureau geocoding service — resolves an address to coordinates and census geography (e.g. tract).",
+  CENSUS_TIGERWEB: "U.S. Census Bureau TIGERweb — housing unit counts from the decennial census.",
+  USDM_CURRENT: "U.S. Drought Monitor — weekly drought severity classification (NOAA / USDA / NDMC).",
+  NOAA_NCEI_NCLIMGRID_DAILY: "NOAA's gridded daily climate data — used here for extreme-heat day counts.",
+  NOAA_ASCE_WIND_VECTORS: "ASCE 7 structural design wind speed maps, distributed via NOAA.",
+  USGS_3DEP_COG: "USGS 3D Elevation Program — terrain elevation, slope, and aspect.",
+  USFS_LCMS: "US Forest Service Land Change Monitoring System — land cover classification (~120m resolution).",
+  USFS_NLCD_TCC: "USFS/NLCD Tree Canopy Cover — percent tree canopy (~120m resolution).",
+  COPERNICUS_S2_SR_HARMONIZED: "Copernicus Sentinel-2 satellite imagery — used here for NDVI vegetation greenness/dryness (~10m resolution).",
+};
+
+function term(displayHtml, definition) {
+  if (!definition) return displayHtml;
+  return `<span class="term" tabindex="0">${displayHtml}<span class="term-tip" role="tooltip">${definition}</span></span>`;
+}
 
 function fmt(n, digits = 4) {
   if (n === null || n === undefined) return "—";
@@ -234,7 +307,7 @@ function fmtFull(n) {
 
 function citationSourceTag(citation) {
   if (!citation || citation.status !== "ok" || !citation.source) return "";
-  return `<span class="src-tag">${citation.source}</span>`;
+  return `<span class="src-tag">${term(citation.source, SOURCE_GLOSSARY[citation.source])}</span>`;
 }
 
 function renderHeaderCard(blob) {
@@ -244,13 +317,17 @@ function renderHeaderCard(blob) {
       ? `${Number(h.parcel_area_m2.value).toLocaleString(undefined, { maximumFractionDigits: 0 })} m&sup2;`
       : null;
   const tract = h.tract_geoid && h.tract_geoid.status === "ok" ? h.tract_geoid.value : null;
+  const ringOriginLabel = h.ring_origin.parcel_aware
+    ? term("parcel centroid", GLOSSARY.parcel_centroid)
+    : "geocoded point (fixed-radius fallback)";
 
   return `
     <div class="card header-card">
       <div class="addr">${h.matched_address}</div>
-      <div class="coords">${h.geocoded_lat.toFixed(5)}, ${h.geocoded_lng.toFixed(5)} &middot; ring origin: ${
-    h.ring_origin.parcel_aware ? "parcel centroid" : "geocoded point (fixed-radius fallback)"
-  }</div>
+      <div class="coords">${h.geocoded_lat.toFixed(5)}, ${h.geocoded_lng.toFixed(5)} &middot; ${term(
+    "ring origin",
+    GLOSSARY.ring_origin
+  )}: ${ringOriginLabel}</div>
       ${
         parcelSize
           ? `<div class="header-fact-row"><span class="header-fact-label">Parcel size</span><span class="header-fact-value">${parcelSize}${citationSourceTag(
@@ -285,14 +362,15 @@ function renderBandCard(blob) {
       const pct = d.normalized === null ? 0 : Math.round(d.normalized * 100);
       const raw = d.raw === null ? "no data" : typeof d.raw === "number" ? fmt(d.raw, 4) : d.raw;
       const source = d.citation && d.citation.status === "ok" ? d.citation.source : null;
+      const sourceHtml = source ? ` &middot; ${term(source, SOURCE_GLOSSARY[source])}` : "";
       return `
         <div class="driver-row">
           <div class="driver-row-top">
-            <span class="driver-name">${driverLabels[key] || key}</span>
+            <span class="driver-name">${term(driverLabels[key] || key, GLOSSARY[key])}</span>
             <span class="driver-weight">weight ${(d.weight * 100).toFixed(0)}%</span>
           </div>
           <div class="driver-bar-track"><div class="driver-bar-fill" style="width:${pct}%"></div></div>
-          <div class="driver-meta">raw: ${raw}${source ? ` &middot; ${source}` : d.raw === null ? " &middot; missing/failed (excluded, weight renormalized)" : " &middot; computed internally, no single citation"}</div>
+          <div class="driver-meta">raw: ${raw}${sourceHtml || (d.raw === null ? " &middot; missing/failed (excluded, weight renormalized)" : " &middot; computed internally, no single citation")}</div>
         </div>
       `;
     })
@@ -301,8 +379,8 @@ function renderBandCard(blob) {
   return `
     <div class="card">
       <h3>Overall exposure</h3>
-      <span class="band-badge ${bandClass(o.band)}">${o.band}</span>
-      <div class="band-composite">composite score ${fmt(o.composite, 4)} &mdash; every driver below is shown, not a black box</div>
+      <span class="band-badge ${bandClass(o.band)}">${term(o.band, GLOSSARY.band)}</span>
+      <div class="band-composite">${term("composite score", GLOSSARY.composite)} ${fmt(o.composite, 4)} &mdash; every driver below is shown, not a black box</div>
       ${driverRows}
     </div>
   `;
@@ -316,7 +394,7 @@ function renderCaveatCard(blob) {
     <div class="caveat-card">
       <h3>Interpretation caveat</h3>
       <p>${c.reason}</p>
-      <div class="caveat-inline">Wildfire annual frequency: ${fmtFull(cite.value)} (source: ${cite.source})</div>
+      <div class="caveat-inline">${term("Wildfire annual frequency", GLOSSARY.wildfire_annual_frequency)}: ${fmtFull(cite.value)} (source: ${term(cite.source, SOURCE_GLOSSARY[cite.source])})</div>
       <div class="caveat-disclaimer">This is a note on how to interpret the data above — it does not change the exposure band shown above.</div>
     </div>
   `;
@@ -331,7 +409,7 @@ function renderFailuresCard(blob) {
     .map(
       (f) => `
       <div class="fail-item">
-        <span class="fail-field">${f.field}</span> from ${f.source || "unknown source"} &mdash;
+        <span class="fail-field">${f.field}</span> from ${f.source ? term(f.source, SOURCE_GLOSSARY[f.source]) : "unknown source"} &mdash;
         <span class="fail-error">${f.error}</span>
         ${f.lat && f.lng ? `<div class="gap-note">at ${f.lat.toFixed(4)}, ${f.lng.toFixed(4)}${f.retryable ? " (retryable)" : ""}</div>` : ""}
       </div>`
@@ -345,6 +423,8 @@ function renderFailuresCard(blob) {
   `;
 }
 
+const ZONE_GLOSSARY_KEYS = { "Zone 0": "zone_0", "Zone 1": "zone_1", "Zone 2": "zone_2" };
+
 function renderZonesCard(blob) {
   const ap = blob.action_plan;
   const priorities = ap.zone_priority_directions
@@ -353,7 +433,7 @@ function renderZonesCard(blob) {
         .map(
           ([zoneName, zone]) => `
         <div class="zone-block">
-          <strong>${zoneName} (${zone.range})</strong>
+          <strong>${term(zoneName, GLOSSARY[ZONE_GLOSSARY_KEYS[zoneName]])} (${zone.range})</strong>
           <ul>${zone.actions.map((a) => `<li>${a}</li>`).join("")}</ul>
         </div>
       `
@@ -361,7 +441,7 @@ function renderZonesCard(blob) {
         .join("");
       return `
         <div class="zone-priority">
-          <h4>Priority: ${p.direction} &mdash; directional threat ${fmt(p.directional_threat, 3)}</h4>
+          <h4>Priority: ${p.direction} &mdash; ${term("directional threat", GLOSSARY.directional_threat)} ${fmt(p.directional_threat, 3)}</h4>
           ${zoneBlocks}
         </div>
       `;
@@ -373,7 +453,7 @@ function renderZonesCard(blob) {
       <h3>Prioritized action plan</h3>
       ${priorities}
       <div class="reg-note">${ap.zone_0_status_caveat}</div>
-      <div class="hardening-note"><strong>${"Structure hardening (generic CAL FIRE guidance)"}</strong><br/>${ap.structure_hardening_note}<ul>${ap.structure_hardening_actions
+      <div class="hardening-note"><strong>Structure hardening (generic CAL FIRE guidance)</strong><br/>${ap.structure_hardening_note}<ul>${ap.structure_hardening_actions
         .map((a) => `<li>${a}</li>`)
         .join("")}</ul></div>
     </div>
@@ -409,14 +489,14 @@ function renderSourcesCard(blob) {
   const rows = collectCitations(blob)
     .map((s) => {
       const confidences = Array.from(s.confidences)
-        .map((c) => `<span class="confidence-tag">${c}</span>`)
+        .map((c) => `<span class="confidence-tag">${term(c, GLOSSARY["confidence_" + c])}</span>`)
         .join(" ");
       const fetchedAts = Array.from(s.fetchedAts);
       const fetchedDisplay =
         fetchedAts.length > 1 ? `${fetchedAts.length} timestamps (multiple sample points)` : fetchedAts[0] || "—";
       return `
         <tr>
-          <td>${s.source}</td>
+          <td>${term(s.source, SOURCE_GLOSSARY[s.source])}</td>
           <td>${s.source_url ? `<a href="${s.source_url}" target="_blank" rel="noopener">link</a>` : "—"}</td>
           <td>${confidences}</td>
           <td>${fetchedDisplay}</td>
@@ -429,7 +509,7 @@ function renderSourcesCard(blob) {
     <div class="card">
       <h3>Sources (browse the provenance)</h3>
       <table class="sources-table">
-        <thead><tr><th>Source</th><th>URL</th><th>Confidence</th><th>Fetched at</th></tr></thead>
+        <thead><tr><th>Source</th><th>URL</th><th>${term("Confidence", "How reliable this specific reading is, as reported by the underlying data source.")}</th><th>Fetched at</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -539,13 +619,13 @@ function renderProseSimpleMarkdown(md) {
 
 function renderReportPanel(data) {
   if (!data.prose_available || !data.prose) {
-    els.tabReport.innerHTML = `
+    els.reportContent.innerHTML = `
       <div class="prose-note">${data.prose_error || "No written report available for this request."}</div>
       <div class="prose-note">The scored data above is complete regardless — the written report is a Claude-authored narrative summary of it, not a separate data source.</div>
     `;
     return;
   }
-  els.tabReport.innerHTML = `<div class="prose-body">${renderProseSimpleMarkdown(data.prose)}</div>`;
+  els.reportContent.innerHTML = `<div class="prose-body">${renderProseSimpleMarkdown(data.prose)}</div>`;
 }
 
 // --- top-level flow ---
@@ -569,6 +649,147 @@ function switchTab(tabName) {
 
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+// Export as PDF: switch to the report tab, then hand off to the browser's
+// native print dialog ("Save as PDF" in every modern browser's print UI).
+// No PDF-generation library needed — style.css's @media print rules hide
+// everything except the rendered report prose.
+els.exportPdfBtn.addEventListener("click", () => {
+  switchTab("report");
+  window.print();
+});
+
+// --- address autocomplete ---
+// Uses OpenStreetMap's Nominatim search API for suggestions as the user
+// types — free, keyless, same pattern as the OSM map tile layer already in
+// use. Only ever sends the partial address text being typed; no secrets
+// involved. The final geocode (what actually determines lat/lng for
+// scoring) still goes through the Census Geocoder on the backend — this is
+// suggestions only, not a second source of truth.
+const AUTOCOMPLETE_MIN_CHARS = 4;
+const AUTOCOMPLETE_DEBOUNCE_MS = 350;
+const CALIFORNIA_VIEWBOX = "-124.5,42.1,-114.0,32.4"; // left,top,right,bottom
+
+let autocompleteTimer = null;
+let autocompleteAbortController = null;
+let currentSuggestions = [];
+let highlightedIndex = -1;
+
+function escapeHtmlLite(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function fetchAddressSuggestions(query) {
+  if (autocompleteAbortController) autocompleteAbortController.abort();
+  autocompleteAbortController = new AbortController();
+
+  const params = new URLSearchParams({
+    format: "json",
+    addressdetails: "0",
+    limit: "6",
+    countrycodes: "us",
+    viewbox: CALIFORNIA_VIEWBOX,
+    bounded: "1",
+    q: query,
+  });
+
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
+      signal: autocompleteAbortController.signal,
+      headers: { Accept: "application/json" },
+    });
+    if (!resp.ok) return [];
+    return await resp.json();
+  } catch (err) {
+    if (err.name === "AbortError") return null; // superseded by a newer keystroke
+    return [];
+  }
+}
+
+function hideSuggestions() {
+  // Cancel any pending debounce/in-flight request too — otherwise a slow
+  // autocomplete response can resolve after the form's already been
+  // submitted and pop the dropdown back open over the results.
+  clearTimeout(autocompleteTimer);
+  if (autocompleteAbortController) autocompleteAbortController.abort();
+  els.suggestions.classList.add("hidden");
+  els.suggestions.innerHTML = "";
+  currentSuggestions = [];
+  highlightedIndex = -1;
+}
+
+function updateHighlight() {
+  Array.from(els.suggestions.children).forEach((el, i) => {
+    el.classList.toggle("highlighted", i === highlightedIndex);
+  });
+}
+
+function renderSuggestions(items) {
+  currentSuggestions = items || [];
+  highlightedIndex = -1;
+  if (!currentSuggestions.length) {
+    hideSuggestions();
+    return;
+  }
+  els.suggestions.innerHTML = currentSuggestions
+    .map((item, i) => `<li class="suggestion-item" data-idx="${i}" role="option">${escapeHtmlLite(item.display_name)}</li>`)
+    .join("");
+  els.suggestions.classList.remove("hidden");
+}
+
+function selectSuggestion(idx) {
+  const item = currentSuggestions[idx];
+  if (!item) return;
+  els.input.value = item.display_name;
+  hideSuggestions();
+  runAssessment(item.display_name);
+}
+
+els.input.addEventListener("input", () => {
+  const query = els.input.value.trim();
+  clearTimeout(autocompleteTimer);
+  if (query.length < AUTOCOMPLETE_MIN_CHARS) {
+    hideSuggestions();
+    return;
+  }
+  autocompleteTimer = setTimeout(async () => {
+    const items = await fetchAddressSuggestions(query);
+    if (items === null) return; // aborted — a newer request is already in flight
+    renderSuggestions(items);
+  }, AUTOCOMPLETE_DEBOUNCE_MS);
+});
+
+els.input.addEventListener("keydown", (e) => {
+  if (els.suggestions.classList.contains("hidden") || currentSuggestions.length === 0) return;
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    highlightedIndex = Math.min(highlightedIndex + 1, currentSuggestions.length - 1);
+    updateHighlight();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    highlightedIndex = Math.max(highlightedIndex - 1, 0);
+    updateHighlight();
+  } else if (e.key === "Enter") {
+    if (highlightedIndex >= 0) {
+      e.preventDefault();
+      selectSuggestion(highlightedIndex);
+    } else {
+      hideSuggestions(); // let the normal form submit proceed with typed text
+    }
+  } else if (e.key === "Escape") {
+    hideSuggestions();
+  }
+});
+
+els.suggestions.addEventListener("click", (e) => {
+  const li = e.target.closest(".suggestion-item");
+  if (!li) return;
+  selectSuggestion(Number(li.dataset.idx));
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-form")) hideSuggestions();
 });
 
 async function runAssessment(address) {
@@ -601,6 +822,7 @@ async function runAssessment(address) {
 
 els.form.addEventListener("submit", (e) => {
   e.preventDefault();
+  hideSuggestions();
   const address = els.input.value.trim();
   if (!address) return;
   runAssessment(address);

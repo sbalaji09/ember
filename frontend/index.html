@@ -15,7 +15,10 @@
     <span class="tagline">Per-home wildfire hardening advisor</span>
   </div>
   <form id="assess-form" class="search-form">
-    <input id="address-input" type="text" placeholder="123 Main St, Santa Rosa, CA" autocomplete="off" required />
+    <div class="search-input-wrap">
+      <input id="address-input" type="text" placeholder="123 Main St, Santa Rosa, CA" autocomplete="off" required />
+      <ul id="address-suggestions" class="suggestions-list hidden" role="listbox"></ul>
+    </div>
     <button type="submit" id="assess-btn">Assess</button>
   </form>
 </header>
@@ -48,7 +51,12 @@
       </nav>
 
       <section id="tab-data" class="tab-panel" role="tabpanel"></section>
-      <section id="tab-report" class="tab-panel hidden" role="tabpanel"></section>
+      <section id="tab-report" class="tab-panel hidden" role="tabpanel">
+        <div class="report-toolbar">
+          <button type="button" id="export-pdf-btn">Export as PDF</button>
+        </div>
+        <div id="report-content"></div>
+      </section>
     </div>
 
   </div>

@@ -305,6 +305,102 @@ output (`triggered`, `reason`, `wildfire_annual_frequency_citation`,
 requires Claude to render `reason` verbatim and forbids using it to imply
 the exposure band should be read differently than stated.
 
+## report.py live-key verification (first real render)
+
+`render_report()` had never been run against a live `ANTHROPIC_API_KEY` until
+this pass — it's the last untested path in the pipeline, and this was treated
+as a verification pass rather than a demo.
+
+**Bug found: silently empty reports.** The first live call used
+`model="claude-sonnet-5"` with `max_tokens=4096` and no `thinking` parameter.
+Extended thinking is on by default for this model and consumed the *entire*
+4096-token budget before writing any output text — the API call succeeded
+(HTTP 200, `stop_reason: "max_tokens"`), but `render_report()` returned an
+empty string, and the CLI printed nothing with exit code 0. This would have
+looked like a working, if terse, integration in any test that only checked
+the exit code. Fixed with `max_tokens=8192` and `thinking={"type": "disabled"}`
+in the `messages.create()` call.
+
+**No automated test coverage for `render_report()`.** It requires a live
+Anthropic API key, so `tests/test_scoring.py` (the only test file) can't
+exercise it. It was verified manually instead: ran `./ember` (prose) and
+`./ember --json` (ground truth) on the same live Paradise fetch and diffed
+every number/citation in the prose against the JSON. All matched exactly —
+no invented numbers, sources, or reinterpreted band. Three lesser gaps found
+on the same pass and fixed via `SYSTEM_PROMPT` tightening (pass-through only,
+no new LLM-originated data):
+1. The Interpretation Caveat section stated its boilerplate reason text but
+   not the `wildfire_annual_frequency` value/source that triggered it,
+   leaving the reader to find it in the Overall Exposure table instead.
+   Fixed: system prompt now requires rendering
+   `fuel_history_caveat.wildfire_annual_frequency_citation`'s `.value` and
+   `.source` inline, explicitly as a pass-through ("render the value
+   present in the JSON," never "state the frequency").
+2. The Header section dropped `parcel_area_m2` and `tract_geoid` even though
+   both were present in `build_report_data`'s output — the README specifies
+   "parcel size, tract" belongs in the header. Fixed: system prompt now
+   requires both, pass-through only, omitted gracefully if either field's
+   status isn't `"ok"`.
+3. The whole response was wrapped in a stray ` ```markdown ` fence — cosmetic
+   but meant the CLI's raw printed output had literal backticks around the
+   entire report. Fixed: system prompt now explicitly forbids wrapping the
+   full response in a code fence.
+
+Re-rendered Paradise after the fix and confirmed all three: the caveat now
+reads "Wildfire annual frequency: 0.0013979252442599456 (source: FEMA_NRI)"
+inline, which matches `./ember --json`'s
+`fuel_history_caveat.wildfire_annual_frequency_citation.value` exactly
+(`0.0013979252442599456`) — proving pass-through, not LLM invention; the
+header shows parcel size and tract; no code fence appears anywhere in the
+output. All 22 tests still pass (none of them exercise `render_report`
+itself, per the gap noted above).
+
+## Non-determinism across runs (NDVI rolling window)
+
+Ember's output is **not deterministic across runs at different times**, even
+for the same address with no code changes. `ndvi_current`'s dataset vintage
+is a rolling ~60-day Sentinel-2 composite window that advances with the
+query date, so per-bearing fuel scores (and therefore `max_directional_threat`
+and the overall composite) can drift run to run. Observed directly during
+this investigation: Paradise's composite moved from 0.1809 to 0.1516 to
+0.1809 again across three `./ember` invocations made within the same
+session, with `S` bearing's fuel score alone moving from 0.1587 to 0.1040
+between two consecutive runs. The exposure band was stable across all of
+these (`Low` throughout), but the exact composite was not. **Any captured
+demo report must be timestamped** and treated as a snapshot, not a fixed
+reference value — re-running the same address later is expected to produce
+slightly different numbers, and that's a property of the live data sources,
+not a bug.
+
+## partial_failures are transient/retryable, not persistent per-location gaps
+
+While capturing demo reports, Big Bear Lake (40650 Village Dr) was re-fetched
+to serve as the live demonstration of "a real partial_failures entry
+surfaces, it isn't dropped" (it had shown 3 `slope_degrees` DEM read
+failures twice before, during the Phase 2 spike and the recalibration
+investigation). At capture time it came back with `partial_failures: []` —
+clean. Three immediate direct `/v1/fetch` retries at the exact failing
+coordinates also came back clean. A time-boxed probe (~5 min) of 3 more
+remote/rugged CA coordinates (Yosemite high country, Trinity Alps, a Mt.
+Whitney ridge point) found no live failures either.
+
+**Conclusion:** the DEM COG read failures are transient/retryable server-side
+issues (consistent with `retryable: true` on those specific failures), not a
+persistent gap tied to that location. This means "surface a real gap, don't
+drop it" can't be reliably demonstrated with a live capture on demand — it
+depends on catching a transient failure at exactly the right moment. Instead,
+verified deterministically: `tests/test_report.py` forces a synthetic
+`mireye_partial_failures` list through `build_report_data()` and asserts
+(a) the list survives unfiltered into `report_data`, and (b) the failing
+field name and error text are both present in the exact JSON string that
+gets sent to Claude — the actual mechanism that would let a gap go missing
+if some future refactor filtered fields out before serialization. Also
+added: a case confirming an empty `partial_failures` list still renders as
+an explicit empty list (key present), never an absent key, and a case
+confirming `scoring.py`'s own `gaps` (distinct from Mireye-level
+`partial_failures` — a null/failed field status, not a request-level
+failure) also survive into `report_data` unfiltered.
+
 ## Environment / tooling
 
 - Local Python 3.13 (`/Library/Frameworks/Python.framework`) has a broken

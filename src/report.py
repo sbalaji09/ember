@@ -39,14 +39,26 @@ the standard zone checklist.
 Header, Overall Exposure, Interpretation Caveat (only if fuel_history_caveat.triggered is true — \
 omit this section entirely if it is false), Terrain and Approach, Directional Fuel Findings, \
 Prioritized Action Plan, Sources, What This Cannot See.
+- Header must include parcel size and tract, drawn only from header.parcel_area_m2 and \
+header.tract_geoid in the JSON (their .value and .source fields) — pass them through as given. \
+If either has status other than "ok" or is null, omit that line gracefully rather than stating a \
+missing value or inventing one.
 - The Interpretation Caveat section, when present, is a note about DATA INTERPRETATION, not a \
 risk-level adjustment. It never changes or reinterprets the exposure band computed in Overall \
 Exposure. Render the exact text of fuel_history_caveat.reason verbatim — do not paraphrase, \
 soften, strengthen, or add to it. Do not use it to imply the exposure band is wrong or should be \
-read differently than stated.
+read differently than stated. Immediately alongside that text, also render the frequency value \
+and source already present in fuel_history_caveat.wildfire_annual_frequency_citation (its .value \
+and .source fields) — pass that number through exactly as given; never state, estimate, or \
+paraphrase a frequency figure from your own reasoning. If you find yourself about to write a \
+number that is not read directly from a field in the JSON, stop — that number does not belong in \
+the report.
 - In Sources, list every distinct (source, source_url) pair actually used, each with its \
 confidence level(s) and fetched_at timestamp(s) as given.
 - Do not add sections, disclaimers, or content beyond what the data supports.
+- Output raw Markdown only. Do NOT wrap the entire response in a code fence (no leading/trailing \
+``` of any kind around the whole report). Markdown tables and headers are fine; a fence around \
+the full document is not.
 """
 
 
@@ -170,7 +182,8 @@ def render_report(report_data, client=None):
 
     response = client.messages.create(
         model=REPORT_MODEL,
-        max_tokens=4096,
+        max_tokens=8192,
+        thinking={"type": "disabled"},
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_content}],
     )

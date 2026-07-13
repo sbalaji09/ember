@@ -515,6 +515,7 @@ function renderProseSimpleMarkdown(md) {
   let html = "";
   let inTable = false;
   let inList = false;
+  let pendingRightAlignCols = null; // set by !TABLE_RIGHT_COLS[...] for the next table only
 
   const closeList = () => {
     if (inList) {
@@ -526,6 +527,7 @@ function renderProseSimpleMarkdown(md) {
     if (inTable) {
       html += "</tbody></table>";
       inTable = false;
+      pendingRightAlignCols = null;
     }
   };
 
@@ -536,6 +538,38 @@ function renderProseSimpleMarkdown(md) {
       closeTable();
       continue;
     }
+    // Deterministic band badge marker emitted by report_format.py — reuses
+    // the same .band-badge/.band-* classes as the Data & Sources tab, so
+    // the Written Report and PDF show the identical, already-tested badge
+    // rather than the LLM trying (and inevitably sometimes failing) to
+    // reproduce colored HTML through plain Markdown.
+    const bandMatch = line.match(/^!BAND\[(.+)\]$/);
+    if (bandMatch) {
+      closeList();
+      closeTable();
+      const band = bandMatch[1];
+      html += `<div class="report-band-block"><span class="band-badge ${bandClass(band)}">${escapeHtml(band)}</span></div>`;
+      continue;
+    }
+    // Distinct-but-calm card wrapper for the Interpretation Caveat and What
+    // This Cannot See sections — reuses the Data tab's .caveat-card (a
+    // neutral parchment info card, never styled red/alarming) and a plain
+    // .limitations-card. The content between START/END is still ordinary
+    // Markdown (headers/lists/bold), just rendered inside the wrapping div.
+    const blockStartMatch = line.match(/^!BLOCK_START\[(\w+)\]$/);
+    if (blockStartMatch) {
+      closeList();
+      closeTable();
+      const blockClass = blockStartMatch[1] === "caveat" ? "caveat-card" : "limitations-card";
+      html += `<div class="${blockClass}">`;
+      continue;
+    }
+    if (/^!BLOCK_END$/.test(line)) {
+      closeList();
+      closeTable();
+      html += "</div>";
+      continue;
+    }
     if (/^#{1,3}\s+/.test(line)) {
       closeList();
       closeTable();
@@ -543,16 +577,25 @@ function renderProseSimpleMarkdown(md) {
       html += `<h${level}>${inlineMd(line.replace(/^#{1,3}\s+/, ""))}</h${level}>`;
       continue;
     }
+    // Emitted by report_format.py's _table() immediately before a table,
+    // when some columns hold actual numbers (not names/URLs/timestamps) —
+    // applied to the next table only, then consumed.
+    const rightAlignMatch = line.match(/^!TABLE_RIGHT_COLS\[([\d,]+)\]$/);
+    if (rightAlignMatch) {
+      pendingRightAlignCols = new Set(rightAlignMatch[1].split(",").map(Number));
+      continue;
+    }
     if (/^\|/.test(line.trim())) {
       const cells = line.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
       if (cells.every((c) => /^-+$/.test(c))) continue; // separator row
+      const cellStyle = (i) => (pendingRightAlignCols && pendingRightAlignCols.has(i) ? ' style="text-align:right"' : "");
       if (!inTable) {
         html += "<table><thead>";
-        html += "<tr>" + cells.map((c) => `<th>${inlineMd(c)}</th>`).join("") + "</tr>";
+        html += "<tr>" + cells.map((c, i) => `<th${cellStyle(i)}>${inlineMd(c)}</th>`).join("") + "</tr>";
         html += "</thead><tbody>";
         inTable = true;
       } else {
-        html += "<tr>" + cells.map((c) => `<td>${inlineMd(c)}</td>`).join("") + "</tr>";
+        html += "<tr>" + cells.map((c, i) => `<td${cellStyle(i)}>${inlineMd(c)}</td>`).join("") + "</tr>";
       }
       continue;
     }
@@ -575,7 +618,12 @@ function renderProseSimpleMarkdown(md) {
   function inlineMd(s) {
     let out = escapeHtml(s);
     out = out.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    out = out.replace(/\*(.+?)\*/g, "<em>$1</em>");
     out = out.replace(/`(.+?)`/g, "<code>$1</code>");
+    // [text](url) — source names in the Sources table link to source_url.
+    // Safe to allow here: url text comes from our own backend's static
+    // Mireye/CAL FIRE source catalog, not user input.
+    out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
     return out;
   }
 }

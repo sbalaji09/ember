@@ -564,6 +564,86 @@ silently-swallowed network error (ad blocker, offline, corporate proxy)
 would otherwise be indistinguishable from "no suggestions for this query"
 with zero trace for anyone debugging via devtools.
 
+## Report/PDF presentation rewrite: Python renders structure, Claude renders only narrative
+
+The Written Report / PDF view had accumulated real presentation bugs: a
+broken Sources table (raw microsecond ISO timestamps, multiple citations
+from the same source — e.g. REGRID's parcel_address/area/boundary — each
+getting their own jammed cell instead of collapsing to one row), the full
+CAL FIRE Zone 0/1/2 checklist printed once per priority direction (so a
+two-direction report repeated the same 12 action items twice), raw
+scientific-notation frequencies, and a flat, hard-to-scan document with no
+visual hierarchy or prominent band badge.
+
+**Root cause:** the previous design asked Claude to both compute the
+document's *structure* (tables, dedup, formatting) and write its *prose* in
+a single pass. LLM markdown generation is not reliably deterministic for
+structural concerns like "exactly one row per source" or "don't repeat this
+list" — prompting harder helps but doesn't guarantee it, and this is
+exactly the kind of thing that should never depend on an LLM getting it
+right at inference time.
+
+**Fix — architectural, not just prompt tuning.** Added `src/report_format.py`:
+pure Python functions that assemble the *entire* document structure
+(header facts, exposure table, directional-fuel table, a single deduplicated
+Sources table, a single Zone 0/1/2 checklist, data-fetch failures, "what
+this cannot see") plus all number/timestamp formatting (`format_frequency()`
+handles the sub-0.001 sci-notation+plain-language-tag case, `format_score()`,
+`format_slope()`, `humanize_timestamp()`/`humanize_timestamp_range()` for
+collapsing multiple fetches from one source into one clean row/range).
+`report.py`'s `render_report()` now asks Claude for exactly three short
+*qualitative* paragraphs (summary/terrain/fuel — see `NARRATIVE_SYSTEM_PROMPT`,
+parsed via `===SUMMARY===`/`===TERRAIN===`/`===FUEL===` markers, not JSON,
+for simpler and more forgiving parsing) and is explicitly told never to cite
+a specific number, since every number already has a guaranteed-correct home
+in a Python-rendered table. The LLM literally cannot restate a number
+incorrectly anymore — it's not given the option.
+
+The frontend's minimal Markdown renderer (`renderProseSimpleMarkdown` in
+`app.js`) gained three small, deliberately narrow extensions to render
+Python's deterministic markers as real HTML: `!BAND[Low]` → the same
+`.band-badge`/`.band-*` CSS classes already used and tested in the Data tab
+(so the Written Report and PDF show an identical, prominent, color-coded
+badge, not a second implementation); `!BLOCK_START[caveat|limitations]` /
+`!BLOCK_END` → wraps the Interpretation Caveat and What This Cannot See
+sections in the same calm, non-alarming card styling as the Data tab;
+`!TABLE_RIGHT_COLS[1,2]` → right-aligns only the genuinely numeric columns
+(the driver table's Source column and the Sources table's URL/confidence/
+timestamp columns stay left-aligned, since right-aligning text there would
+look wrong). Also added `[text](url)` link syntax so source names in the
+Sources table are clickable.
+
+**Discipline verified, not just asserted:** `build_report_data()` — the
+function that produces `report_data` / `./ember --json`'s output — was not
+touched at all (confirmed via `git diff` showing zero changes to that
+function's body). `report_format.py`'s functions only ever *read*
+`report_data`; `tests/test_report_format.py` includes a deep-copy
+before/after equality check and a `json.dumps()` before/after equality
+check specifically to prove none of the new formatting code mutates or
+loses precision from the underlying scored data — the full-precision
+numbers Python computed are exactly what a future scoring audit or
+regression test would still see.
+
+**PDF-specific bug found and fixed during verification:** Chromium strips
+background colors when printing by default (unless the user manually
+enables "background graphics" in the print dialog) — the band badge and
+caveat/limitations cards were rendering as plain grayscale text in the
+exported PDF even though they looked correct on-screen. Fixed with a
+`print-color-adjust: exact` rule in `@media print`. Caught by actually
+rendering a PDF and inspecting it (`page.pdf()` via Playwright, converted
+to PNG with `pdftoppm` for visual inspection) rather than only checking the
+on-screen view — the two render paths share the same HTML/CSS but Chromium
+applies different rules for print, which a screen-only check would have
+missed entirely.
+
+Verified live end-to-end for two addresses: Paradise (Interpretation Caveat
+present, styled as a calm parchment card, not red/alarming) and a flat
+Sunnyvale address (caveat correctly absent, `drought_category` correctly
+shown as "absent/null — contributed 0.0", `wildfire_annual_frequency`
+correctly shown as "0 (none recorded)" rather than blank or an error). Both
+rendered as multi-page PDFs with the Sources table intact on one page, no
+mid-table page breaks, and the band badge printing in full color.
+
 ## Environment / tooling
 
 - Local Python 3.13 (`/Library/Frameworks/Python.framework`) has a broken

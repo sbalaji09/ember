@@ -1,65 +1,64 @@
 """Turns already-scored, already-cited data into readable prose.
 
 The LLM (Claude) never computes a risk number, never invents a source, and
-never sees raw Mireye responses — only the structured, deterministic output
-of scoring.py plus a static CAL FIRE checklist. Its only job is prose.
+never sees raw Mireye responses. As of this version it doesn't even see
+full report_data: the deterministic parts of the report (header facts, the
+exposure table, the directional-fuel table, the Sources table, the Zone
+0/1/2 checklist, data-fetch failures, "what this cannot see") are assembled
+directly in Python by report_format.render_report_markdown() — plain string
+formatting, not LLM output, so the tables are always aligned, the Sources
+list always has exactly one row per source, and the Zone checklist is never
+duplicated per direction. Claude's only job is three short QUALITATIVE
+narrative paragraphs (see NARRATIVE_SYSTEM_PROMPT) that describe the data
+in prose without citing exact figures — it is deliberately not given the
+precision to restate a number even if it wanted to.
 """
 
 import json
 import os
+import re
 
 import anthropic
 
 import config
 import cal_fire_zones
 import scoring
+import report_format
 
 REPORT_MODEL = os.environ.get("EMBER_REPORT_MODEL", "claude-sonnet-5")
 
-SYSTEM_PROMPT = """You are a technical writer producing a wildfire hardening report for one \
-California home. You are given a JSON object containing ALREADY-COMPUTED, ALREADY-CITED data: \
-deterministic risk scores, threat directions, an exposure band, per-value provenance \
-(source/source_url/fetched_at/confidence), explicit data gaps, and a static CAL FIRE \
-defensible-space checklist.
+NARRATIVE_SYSTEM_PROMPT = """You are writing three SHORT interpretive paragraphs for a wildfire \
+hardening report, from ALREADY-COMPUTED, ALREADY-CITED data. You do not compute, restate, or \
+round any number — every number already appears in tables elsewhere in the report, so repeating \
+exact figures here would just be redundant clutter. Write in plain, qualitative language instead: \
+relative magnitude, direction, and severity words (e.g. "the steepest and most fuel-dense \
+approach comes from the southwest"), never digits, percentages, or scores.
 
 Non-negotiable rules:
-- Never invent, estimate, guess, or adjust any number, risk level, or exposure band. Use only \
-the values given in the JSON.
-- Never invent or alter a source, source_url, fetched_at, or confidence value. If you state a \
-fact derived from Mireye data, it must trace to a citation in the JSON.
-- If a value is marked as a gap, null, or failed, say so explicitly in the relevant section. \
-Never silently omit or paper over a data gap.
-- Never imply the structure (roof, vents, siding, eaves) was inspected or observed. Structure- \
-hardening guidance is generic CAL FIRE prescriptive advice, not an observation of this building.
-- Never resolve or imply resolution finer than the data supports: tree_canopy_pct and lcms_class \
-are ~120m rasters, wildfire_annual_frequency is census-tract level. Do not claim to know \
-individual 5/30/100 ft zone contents from them — only landscape/directional findings mapped onto \
-the standard zone checklist.
-- Output clean Markdown with exactly these sections, in this order: \
-Header, Overall Exposure, Interpretation Caveat (only if fuel_history_caveat.triggered is true — \
-omit this section entirely if it is false), Terrain and Approach, Directional Fuel Findings, \
-Prioritized Action Plan, Sources, What This Cannot See.
-- Header must include parcel size and tract, drawn only from header.parcel_area_m2 and \
-header.tract_geoid in the JSON (their .value and .source fields) — pass them through as given. \
-If either has status other than "ok" or is null, omit that line gracefully rather than stating a \
-missing value or inventing one.
-- The Interpretation Caveat section, when present, is a note about DATA INTERPRETATION, not a \
-risk-level adjustment. It never changes or reinterprets the exposure band computed in Overall \
-Exposure. Render the exact text of fuel_history_caveat.reason verbatim — do not paraphrase, \
-soften, strengthen, or add to it. Do not use it to imply the exposure band is wrong or should be \
-read differently than stated. Immediately alongside that text, also render the frequency value \
-and source already present in fuel_history_caveat.wildfire_annual_frequency_citation (its .value \
-and .source fields) — pass that number through exactly as given; never state, estimate, or \
-paraphrase a frequency figure from your own reasoning. If you find yourself about to write a \
-number that is not read directly from a field in the JSON, stop — that number does not belong in \
-the report.
-- In Sources, list every distinct (source, source_url) pair actually used, each with its \
-confidence level(s) and fetched_at timestamp(s) as given.
-- Do not add sections, disclaimers, or content beyond what the data supports.
-- Output raw Markdown only. Do NOT wrap the entire response in a code fence (no leading/trailing \
-``` of any kind around the whole report). Markdown tables and headers are fine; a fence around \
-the full document is not.
+- Never invent a number, risk level, fact, or exposure band not present in the JSON you're given.
+- Never claim the structure (roof, vents, siding, eaves) was inspected or observed.
+- Never imply resolution finer than the data supports — land-cover/canopy rasters are ~120m, \
+wildfire frequency is census-tract level. Describe landscape/directional patterns only, never \
+specific defensible-space zone contents.
+- Do not mention any specific numeric value, percentage, or score, anywhere.
+- Output EXACTLY this format and nothing else — no markdown headers, no leading/trailing \
+commentary, no code fence:
+
+===SUMMARY===
+<1-2 sentences: plain-language framing of the overall exposure level and its main qualitative driver(s)>
+===TERRAIN===
+<2-3 sentences: slope/aspect and which approach directions are worst, described qualitatively>
+===FUEL===
+<2-3 sentences: what kind of vegetation surrounds the property and where it concentrates, described qualitatively>
 """
+
+
+def _parse_narrative_sections(text):
+    sections = {"summary": "", "terrain": "", "fuel": ""}
+    pieces = re.split(r"===(SUMMARY|TERRAIN|FUEL)===", text)
+    for i in range(1, len(pieces) - 1, 2):
+        sections[pieces[i].lower()] = pieces[i + 1].strip()
+    return sections
 
 
 def _bearing_summary(bearing_result):
@@ -166,7 +165,9 @@ def build_report_data(address_input, geocode_result, sample, scored):
 
 
 def render_report(report_data, client=None):
-    """Calls Claude to render report_data into Markdown prose. Raises if
+    """Returns the full Markdown report: deterministic structure/tables
+    assembled in Python (report_format), with three short qualitative
+    narrative paragraphs from Claude slotted in. Raises if
     ANTHROPIC_API_KEY is not set — never silently skips citation data."""
     if client is None:
         api_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -177,17 +178,16 @@ def render_report(report_data, client=None):
             )
         client = anthropic.Anthropic(api_key=api_key)
 
-    user_content = (
-        "Render this report data as Markdown, following the system prompt rules exactly:\n\n"
-        + json.dumps(report_data, indent=2, default=str)
-    )
+    narrative_input = report_format.build_narrative_input(report_data)
 
     response = client.messages.create(
         model=REPORT_MODEL,
-        max_tokens=8192,
+        max_tokens=1024,
         thinking={"type": "disabled"},
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_content}],
+        system=NARRATIVE_SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": json.dumps(narrative_input, indent=2, default=str)}],
     )
+    raw_text = "".join(block.text for block in response.content if block.type == "text").strip()
+    narrative = _parse_narrative_sections(raw_text)
 
-    return "".join(block.text for block in response.content if block.type == "text")
+    return report_format.render_report_markdown(report_data, narrative)

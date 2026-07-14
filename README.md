@@ -2,280 +2,128 @@
 
 **A per-home wildfire hardening advisor for California properties.**
 
-Type in a California address and get a defensible-space and structure-hardening plan grounded in federal fire, fuel, and terrain data. Every recommendation is traceable to its source.
+Type in an address. Get back which side of the house the fire risk actually comes from, why, and a defensible-space plan reordered around that — not the same statewide checklist CAL FIRE hands every homeowner.
 
-## Why this exists
+"Harden your home" advice in California is almost always generic, because most tools have no way to make it specific. What actually differs house to house is which direction the slope carries fire toward the parcel, which side has the heaviest and driest fuel, and how close the neighbors are. Ember reads that directly from federal terrain, land-cover, and fire-weather data, scores it deterministically, and turns the standard Zone 0/1/2 checklist into a plan for *that* lot — with every number traceable back to its source.
 
-After the Tubbs, Camp, and Palisades fires, "harden your home" became standard advice. But the advice is usually generic: CAL FIRE publishes the same Zone 0/1/2 checklist for every house in the state.
+**Who it's for:** California wildland-urban interface homeowners, fire-safe councils, insurers, and mitigation contractors — anyone who needs a defensible-space assessment they can actually stand behind, not a plausible-sounding guess.
 
-What actually drives risk at a specific home is site-specific:
+## What a report looks like
 
-- Which direction the slope carries fire toward the parcel
-- How much canopy and dry brush surrounds the structure
-- Which side of the parcel has the heaviest fuel
-- How often the surrounding area burns
+```text
+Wildfire Hardening Report — 6626 SKYWAY, PARADISE, CA, 95969
 
-Ember reads the fuel and terrain around a specific parcel from Mireye, then turns the standard checklist into a prioritized plan for that lot.
+  Low
 
-**Who it is for:** California wildland-urban interface homeowners, fire-safe councils, insurers, and mitigation contractors.
+Composite score: 0.181 — Band: Low
 
-## Why Mireye
+Overall exposure for this property sits at the low end of the scale, with the
+main influence coming from vegetation and terrain conditions concentrated to
+the west and southwest rather than from any widespread hazard.
 
-This is the core product argument:
+Interpretation Caveat
+  This area has a recorded wildfire history in the tract-level data, but the
+  current fuel reading directly around the property is low. A low current
+  fuel reading may reflect prior burn, clearing, or development rather than
+  durable safety.
+
+Worst approach directions: W (0.451), SW (0.215)
+
+Priority: W — Zone 1 (5–30 ft): space tree canopies at least 10 ft apart;
+remove ladder fuels (shrubs under trees) ...
+```
+
+Every value above — the band, the composite, the caveat, the directional scores — is deterministic and cited. The only thing an LLM writes is the paragraph of prose around them, and it's never given the freedom to compute or restate a number.
+
+## What it does
+
+- **Directional, not generic.** Samples a ring of points around the parcel at 100m/250m/500m in all 8 compass directions, scores fuel density and slope-driven fire spread per direction, and surfaces the worst 1–2 approach directions — then maps the CAL FIRE Zone 0/1/2 checklist onto those directions instead of printing it once per house.
+- **Deterministic scoring, LLM-written prose.** Every risk number, band, and directional score comes out of a fixed, documented formula (weights live in `config.py`). Claude's only job is turning already-scored numbers into readable paragraphs — it cannot invent a risk level or a source, and it's structurally prevented from restating a number wrong.
+- **An interpretation caveat that doesn't move the needle.** When a property has a real fire history but the current fuel reading around it is low, Ember flags that tension explicitly — without silently boosting the score to make the low band feel more "correct."
+- **Full provenance, end to end.** Every value in a report carries its source, source URL, confidence, and fetch time, from the raw API response to the final PDF. That audit trail is the actual product: it's what makes a report defensible to a homeowner, a fire-safe council, or an underwriter.
+- **CLI, web app, and PDF export.** Same pipeline, three surfaces — a terminal command for quick lookups, a map-based web app with directional threat arrows, and one-click PDF export for anything that needs to leave the browser.
+- **Honest about resolution.** The underlying rasters can't resolve a 5 ft vs. 100 ft defensible-space zone, so Ember doesn't pretend they can — see [Known Limitations](#known-limitations).
+
+## Quick start
+
+Requires a Mireye API token. An Anthropic API key is optional — without one, you get the full scored data with no written narrative.
+
+```bash
+pip install -r requirements.txt
+
+export MIREYE_TOKEN=<your token>
+export ANTHROPIC_API_KEY=<your key>   # optional — enables the written report
+```
+
+**Command line:**
+
+```bash
+./ember "123 Main St, Santa Rosa, CA"
+./ember --json "123 Main St, Santa Rosa, CA"   # raw scored data, no LLM call
+```
+
+**Web app** (map with directional threat arrows, sourced data browser, PDF export):
+
+```bash
+python3 -m uvicorn src.server:app --reload --port 8420
+```
+
+Then open `http://127.0.0.1:8420/`. See [`frontend/README.md`](frontend/README.md) for details.
+
+## How it works
+
+Ember fuses land cover, terrain, fire-weather, and parcel data from Mireye — one provenance-tagged source, rather than stitching together several APIs with no shared audit trail. An address resolves to coordinates via the (free, federal) Census Geocoder; a ring of 25 points around the parcel gets sampled from Mireye; a deterministic model turns those readings into per-direction threat scores and an overall exposure band; and Claude writes the narrative around numbers it never touches directly.
 
 | Alternative | Why it falls short |
 | --- | --- |
-| Google Maps | Has roads and satellite tiles, but not fuel load, slope, fire frequency, or parcel geometry. It cannot score defensible-space risk. |
-| Generic LLM | Can confidently invent a risk level for an address, but has no grounded data or citations. That is unusable for homeowner action or insurance pricing. |
-| GIS analyst | Could produce a credible assessment, but not per-home at scale and not in seconds. |
+| Google Maps | Roads and satellite tiles, but no fuel load, slope, fire frequency, or parcel geometry — nothing to score defensible-space risk from. |
+| Generic LLM | Will confidently invent a risk level for an address with no grounding or citations. Unusable for homeowner action or insurance pricing. |
+| GIS analyst | Could produce a credible assessment, but not per-home, at scale, in seconds. |
 
-Ember fuses land cover, terrain, fire-weather context, and parcel data from one provenance-tagged source. Every line in the report carries `source`, `source_url`, `fetched_at`, and `confidence`.
+## Data it's grounded in
 
-That audit trail is the product. It is what makes the plan defensible to a homeowner, a fire-safe council, or an underwriter.
+- **Geocoding:** the [Census Geocoder](https://geocoding.geo.census.gov/geocoder/locations/onelineaddress) — free, US-only, keyless.
+- **Terrain & fuel:** slope, aspect, elevation, land-cover class, tree canopy percent, and NDVI (current + 5-year trend), sampled at the parcel centroid and around it.
+- **Fire & weather context:** tract-level wildfire frequency, drought category, design wind speed, and extreme-heat day counts.
+- **Parcel data:** boundary geometry, area, and address, used to sample from the real parcel centroid when available (falling back to a fixed radius around the geocoded point otherwise).
 
-## Hard Design Constraint
+Every one of those fields carries its own source, URL, confidence level, and fetch timestamp, browsable in full from the web app's Sources tab.
 
-Mireye's `tree_canopy_pct` and `lcms_class` come from roughly 120 m block-mode grids. `wildfire_annual_frequency` is census-tract resolution.
+## Known limitations
 
-That means Ember **cannot** resolve a 5 ft vs. 30 ft vs. 100 ft defensible-space zone from those fields. Points that close together can fall in the same raster cell. Do not pretend otherwise.
+Stated plainly, not buried:
 
-Ember therefore works at two honest scales:
+- `tree_canopy_pct` and `lcms_class` are ~120m rasters; `wildfire_annual_frequency` is census-tract resolution. Neither can resolve an individual 5/30/100 ft defensible-space zone — Ember works at landscape/direction scale and maps the standard checklist onto that, not the other way around.
+- No hydrant, road-egress, evacuation, fuel-moisture, roof, vent, or structure-material data is available. Structure-hardening advice is prescriptive CAL FIRE guidance, not an observation of the actual building.
+- Tract-level wildfire frequency can be quietly disconnected from a location's real history — a known, documented case exists in `LIMITATIONS.md`.
+- NDVI is a point-in-time snapshot on a rolling window, so re-running the same address later can shift the exact numbers slightly, even though the underlying conditions haven't changed. The band is stable; the third decimal place isn't a fixed reference value.
+- Free-tier parcel data can lack geometry; Ember falls back to a fixed radius around the geocoded point when that happens.
 
-| Scale | What Ember does |
-| --- | --- |
-| Landscape scale | Samples a ring of points outward from the parcel at radii the rasters can actually resolve: about 100 m, 250 m, and 500 m. This characterizes the fuel landscape and slope/aspect gradient around the home. |
-| Zone scale | Maps the standard CAL FIRE Zone 0/1/2 actions onto those directional findings. Example: "Prioritize Zone 2 fuel reduction on the northeast side, where canopy is densest and slope runs uphill toward the house." |
+For the full, ongoing record of every null, data gap, and resolution caveat encountered — including the case where tract-level fire frequency didn't reflect a well-documented historical fire — see [`LIMITATIONS.md`](LIMITATIONS.md).
 
-`ndvi_current` and `ndvi_change_5y` are Sentinel-2, roughly 10 m resolution. Use them for surrounding vegetation dryness and drying trends, not for per-zone geometry.
-
-Being explicit about this resolution mismatch is also the "where Mireye fell short" write-up.
-
-## Architecture
-
-```text
-address
-  └─► Census Geocoder
-        free, US-only, no key
-        returns lat/lng
-
-lat/lng
-  └─► sampling.py
-        centroid + 8 compass bearings × {100m, 250m, 500m}
-        25 points total
-
-sample points
-  └─► mireye_client.py
-        POST /v1/fetch
-        wildfire_underwrite preset + extras
-        parallel + cached
-
-Mireye values
-  └─► scoring.py
-        deterministic directional threat vectors
-        overall exposure band
-        no LLM risk scoring
-
-scored, cited inputs
-  └─► report.py
-        Claude writes readable prose from the scored numbers
-        citations pass through untouched
-
-report
-  └─► CLI + optional web UI + optional MCP tool
-```
-
-**Key judgment call:** risk scoring is deterministic and transparent. The LLM never invents a risk number. Claude's job in `report.py` is only to turn scored vectors and cited Mireye values into readable, zone-organized prose.
-
-## Data Sources
-
-### Geocoding
-
-Use the Census Geocoder, not Mireye:
-
-```text
-https://geocoding.geo.census.gov/geocoder/locations/onelineaddress
-```
-
-It is free, US-only, keyless, and federal.
-
-### Mireye `/v1/fetch`
-
-Fetch Mireye data per sampled point. Start from the `wildfire_underwrite` preset and add the fields below. Confirm the exact request body and preset membership against the live catalog before implementation.
-
-| Group | Fields | Notes |
-| --- | --- | --- |
-| Core wildfire preset | `elevation`, `slope_degrees`, `lcms_class`, `tree_canopy_pct`, `ndvi_current`, `ndvi_change_5y`, `wildfire_annual_frequency` | Expected from `wildfire_underwrite`. |
-| Terrain | `aspect_degrees`, `aspect_cardinal` | Aspect is approximately the downhill direction. Fire approaching from the downhill side climbs toward the house. |
-| Land cover and WUI proxy | `land_use_class`, `housing_units_density_per_km2`, `nearest_urban_area_distance_m` | Use as a structure-to-structure ignition proxy. If `dist_to_wui_m` exists in the live catalog, use it and drop the proxy. |
-| Fire-weather context | `design_wind_speed_mph`, `drought_category`, `days_above_32c_annual_count`, `mean_annual_dry_bulb_temperature_degc` | Context for exposure scoring. |
-| Parcels | `parcel_boundary_geojson`, `parcel_area_m2`, `parcel_address` | Use for mapping and parcel-aware bearings. Expect these to be null on Regrid's free tier and degrade gracefully. |
-
-### Fetch Strategy
-
-You do not need every field at all 25 points.
-
-- Fetch the full field set at the centroid.
-- Fetch only fuel and terrain fields on the ring: `lcms_class`, `tree_canopy_pct`, `ndvi_current`, `slope_degrees`.
-- Fire ring calls in parallel.
-- Cache by rounded coordinate.
-- Dedupe aggressively because nearby points may hit the same raster cell.
-
-### Provenance Rules
-
-Carry provenance through the entire pipeline:
-
-- `source`
-- `source_url`
-- `fetched_at`
-- `confidence`
-
-Read `partial_failures` on every response. Render failures explicitly, log them, and treat them as data-gap notes. Never silently drop them.
-
-## Scoring Model
-
-The scoring model is deterministic, documented, and tunable. Put all weights in `config.py`.
-
-### Per-bearing fuel score
-
-For each of the 8 compass bearings, aggregate across ring points:
-
-```text
-fuel type weight from lcms_class
-  Trees / Shrubs -> high
-  Grass          -> medium
-  Barren/Impervious/Water -> low
-
-× tree_canopy_pct scaling
-× dryness factor from ndvi_current
-× trend flag from ndvi_change_5y
-```
-
-Lower NDVI in a vegetated class means more cured or dry fuel, which increases the score.
-
-### Slope threat
-
-Compute the uphill azimuth as the opposite of `aspect_degrees`.
-
-Bearings within ±45° of "fire approaching from downhill" get a multiplier that scales with `slope_degrees`. Fire spread roughly doubles per about 10° of upslope; cite this as a rule of thumb, not as a Mireye value.
-
-### Directional threat
-
-```text
-directional threat vector = fuel score × slope multiplier
-```
-
-Surface the top 1-2 worst approach directions.
-
-### Overall property exposure
-
-Calculate a banded level:
-
-- Low
-- Moderate
-- High
-- Very High
-
-Use these inputs:
-
-- `wildfire_annual_frequency` as the tract baseline
-- Maximum directional threat
-- WUI density
-- Drought category
-- Days above 32 C
-- Design wind speed
-
-Show the input drivers. Do not hide the result behind a black-box number.
-
-## Report Output
-
-Each report should include:
-
-- **Header:** address, coordinates, parcel size, tract
-- **Overall exposure:** exposure band and cited drivers
-- **Terrain and approach:** slope magnitude, uphill direction, and worst approach vectors in plain English
-- **Directional fuel findings:** where heavy or dry fuel sits relative to the home
-- **Prioritized action plan:** CAL FIRE Zone 0, Zone 1, and Zone 2 actions reordered by highest-threat directions
-- **Sources:** every value mapped to `source`, `source_url`, `fetched_at`, and `confidence`
-- **What this cannot see:** resolution caveats stated plainly
-
-## CAL FIRE Framework Notes
-
-Use CAL FIRE's defensible-space zone model:
-
-- Zone 0: 0-5 ft, ember-resistant
-- Zone 1: 5-30 ft
-- Zone 2: 30-100 ft
-
-Zone 0 comes from AB 3074 and PRC 4291. Verify the current Zone 0 regulatory and effective status against CAL FIRE before shipping because the ember-resistant-zone rules were still being phased in.
-
-Structure-hardening advice for roof, vents, and eaves is generic CAL FIRE guidance, not observed building evidence. Mireye gives building height, footprint, and class through Overture; it does not observe roof material or vent type. Do not imply the structure was inspected.
-
-## Repository Layout
+## Repository layout
 
 ```text
 ember/
-  README.md              # this file
-  config.py              # scoring weights, ring radii, field lists
+  config.py              # scoring weights, ring radii, field lists — the whole model in one place
   src/
-    geocode.py           # Census geocoder
-    mireye_client.py     # /v1/fetch wrapper, auth, retry, cache, partial_failures
-    sampling.py          # ring generation, parcel-aware with radius fallback
-    scoring.py           # deterministic threat model
-    report.py            # Claude-written prose from scored/cited data
-    cli.py               # ember "123 Main St, Santa Rosa, CA"
-    server.py             # FastAPI backend for the frontend: POST /assess, serves frontend/
-    app.py                # unimplemented stub -- superseded by server.py + frontend/
-    mcp_server.py        # optional assess_wildfire_risk(address) MCP tool
-  frontend/
-    index.html, style.css, app.js  # map + data-viz UI -- see frontend/README.md to run it
+    geocode.py            # Census geocoder
+    mireye_client.py       # /v1/fetch wrapper: auth, retry, cache, partial_failures
+    sampling.py            # ring generation, parcel-aware with radius fallback
+    scoring.py              # deterministic directional threat model
+    report_format.py       # deterministic report structure/number formatting
+    report.py              # Claude-written narrative, slotted into that structure
+    cli.py                  # ember "123 Main St, Santa Rosa, CA"
+    server.py               # FastAPI backend for the web app
+    mcp_server.py           # assess_wildfire_risk(address) MCP tool (stub)
+  frontend/                # map + data-viz web app — see frontend/README.md
   tests/
   demo/
-    addresses.md         # the four demo homes + captured outputs
+    addresses.md            # captured example reports across four real properties
 ```
 
-## Environment
+## Further reading
 
-```text
-MIREYE_TOKEN=<bearer token>
-MIREYE_BASE_URL=https://api.mireye.com
-```
-
-Never hardcode the token.
-
-## Build Plan
-
-1. **Confirm the API contract.** Fetch `https://docs.mireye.ai/llms.txt`, then the `/api-reference/fetch` and `/ask` pages. Lock the exact `/v1/fetch` request body, response envelope, provenance field names, and `partial_failures` shape.
-2. **Verify fields.** Pull `GET /v1/meta/fields`, verify every named field still exists, and note preset membership.
-3. **Run a validation spike.** Fetch the `wildfire_underwrite` preset at one known California fire-country coordinate. Confirm that `tree_canopy_pct`, `lcms_class`, `ndvi_*`, `slope_degrees`, and `wildfire_annual_frequency` come back populated. Print raw provenance.
-4. **Build the data path.** Implement geocoder, Mireye client with cache/retry/partial-failure surfacing, and sampling.
-5. **Implement scoring.** Add deterministic `scoring.py` with unit tests for flat vs. steep, forested vs. barren, and wet vs. cured synthetic inputs.
-6. **Generate reports.** Feed Claude only the scored vectors and cited values. The system prompt must forbid inventing risk levels or sources.
-7. **Ship the CLI.** Get the end-to-end CLI working first, then add optional web UI and/or MCP tool.
-8. **Capture demos.** Run the three demo homes, capture outputs into `demo/`, and keep a running `LIMITATIONS.md` of every null, `partial_failures`, and resolution gap.
-
-## Demo Homes
-
-Pick real addresses in each location and pre-capture their reports for the 30-minute call.
-
-| Area | Why it matters |
-| --- | --- |
-| Coffey Park, Santa Rosa | Flat, dense suburban WUI that still burned in Tubbs in 2017. Tests the structure-to-structure and low-slope/high-density case. |
-| Canyon home above Malibu | Steep slope plus chaparral. Tests the slope-driven directional model. |
-| Paradise, Butte County | Forested ridge affected by the 2018 Camp Fire. Tests canopy, tract fire frequency, and terrain together. |
-
-## Known Limitations
-
-Surface these directly:
-
-- 120 m fuel rasters and tract-level fire frequency cannot resolve individual defensible-space zones.
-- Ember gives landscape-and-direction guidance, then maps the standard zone checklist onto it.
-- No hydrant, road-egress, evacuation, fuel-moisture, roof, vent, or structure-material fields are available.
-- Structure-hardening advice is prescriptive, not observed.
-- NDVI is a point-in-time snapshot; treat dryness as indicative.
-- Free-tier parcels may lack geometry or zoning; fall back to a fixed radius.
-
-## Stretch Ideas
-
-- Let the user drop a pin instead of typing an address.
-- Compare a home to a known past-fire coordinate.
-- Add batch mode for a whole street, producing a fire-safe council heat map of which homes to prioritize.
+- [`LIMITATIONS.md`](LIMITATIONS.md) — the full, honest record of every data gap, calibration decision, and bug found along the way.
+- [`demo/addresses.md`](demo/addresses.md) — four real captured reports (a flat suburban WUI that burned in the Tubbs Fire, a steep Malibu canyon, Paradise, and Big Bear Lake), each annotated with what it demonstrates.
+- [`frontend/README.md`](frontend/README.md) — running and developing the web app.
